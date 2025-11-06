@@ -1,0 +1,112 @@
+<div class="page-header">
+  <h1>📅 Agendamentos</h1>
+  <div class="header-actions">
+    <div class="view-toggle">
+      <button class="btn" [class.btn-primary]="viewMode === 'lista'" [class.btn-secondary]="viewMode !== 'lista'" (click)="viewMode = 'lista'">
+        Lista
+      </button>
+      <button class="btn" [class.btn-primary]="viewMode === 'calendario'" [class.btn-secondary]="viewMode !== 'calendario'" (click)="viewMode = 'calendario'">
+        Calendário
+      </button>
+    </div>
+    <button class="btn btn-primary" (click)="novoAgendamento()">+ Novo Agendamento</button>
+  </div>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <div class="filters-bar">
+    <input
+      type="text"
+      placeholder="Buscar por cliente ou serviço..."
+      [(ngModel)]="searchTerm"
+      (input)="filtrarAgendamentos()"
+      class="search-input"
+    />
+    <select [(ngModel)]="statusFiltro" (change)="filtrarAgendamentos()" class="filter-select">
+      <option value="">Todos os status</option>
+      <option value="agendado">Agendado</option>
+      <option value="concluido">Concluído</option>
+      <option value="cancelado">Cancelado</option>
+    </select>
+    <input
+      type="date"
+      [(ngModel)]="dataFiltro"
+      (change)="filtrarAgendamentos()"
+      class="filter-select"
+    />
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando agendamentos...
+  </div>
+
+  <div *ngIf="!loading && viewMode === 'lista'">
+    <div *ngIf="agendamentosFiltrados.length === 0" class="empty-state">
+      <p>Nenhum agendamento encontrado.</p>
+    </div>
+
+    <table *ngIf="agendamentosFiltrados.length > 0" class="table">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Serviço</th>
+          <th>Profissional</th>
+          <th>Data/Hora</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let agendamento of agendamentosFiltrados">
+          <td>{{ agendamento.cliente?.nome || '-' }}</td>
+          <td>{{ agendamento.servico?.nome || '-' }}</td>
+          <td>{{ agendamento.profissional?.nome || '-' }}</td>
+          <td>{{ formatarDataHora(agendamento.data_hora) }}</td>
+          <td>{{ formatarMoeda(agendamento.valor_cobrado) }}</td>
+          <td>
+            <span class="badge" [ngClass]="getStatusBadgeClass(agendamento.status)">
+              {{ getStatusLabel(agendamento.status) }}
+            </span>
+          </td>
+          <td>
+            <select (change)="atualizarStatus(agendamento.id!, $any($event.target).value)" [value]="agendamento.status" class="status-select">
+              <option value="agendado">Agendado</option>
+              <option value="concluido">Concluído</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+            <button class="btn btn-secondary" (click)="editarAgendamento(agendamento.id!)" style="margin: 5px;">
+              Editar
+            </button>
+            <button class="btn btn-danger" (click)="excluirAgendamento(agendamento.id!)">
+              Excluir
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!loading && viewMode === 'calendario'" class="calendario-view">
+    <div class="calendario-grid">
+      <div *ngFor="let agendamento of agendamentosFiltrados" class="calendario-item">
+        <div class="calendario-data">{{ formatarDataHora(agendamento.data_hora) }}</div>
+        <div class="calendario-info">
+          <strong>{{ agendamento.cliente?.nome }}</strong>
+          <span>{{ agendamento.servico?.nome }}</span>
+          <span class="badge" [ngClass]="getStatusBadgeClass(agendamento.status)">
+            {{ getStatusLabel(agendamento.status) }}
+          </span>
+        </div>
+        <div class="calendario-actions">
+          <button class="btn btn-secondary" (click)="editarAgendamento(agendamento.id!)">Editar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

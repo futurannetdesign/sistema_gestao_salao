@@ -1,0 +1,61 @@
+<div class="page-header">
+  <h1>👥 Clientes</h1>
+  <button class="btn btn-primary" (click)="novoCliente()">+ Novo Cliente</button>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Buscar por nome, celular ou e-mail..."
+      [(ngModel)]="searchTerm"
+      (input)="filtrarClientes()"
+      class="search-input"
+    />
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando clientes...
+  </div>
+
+  <div *ngIf="!loading && clientesFiltrados.length === 0" class="empty-state">
+    <p>Nenhum cliente encontrado.</p>
+  </div>
+
+  <table *ngIf="!loading && clientesFiltrados.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Celular</th>
+        <th>WhatsApp</th>
+        <th>E-mail</th>
+        <th>Data Nascimento</th>
+        <th>Sexo</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cliente of clientesFiltrados">
+        <td>{{ cliente.nome }}</td>
+        <td>{{ formatarTelefone(cliente.celular) }}</td>
+        <td>{{ formatarTelefone(cliente.whatsapp) }}</td>
+        <td>{{ cliente.email || '-' }}</td>
+        <td>{{ formatarData(cliente.data_nascimento) }}</td>
+        <td>{{ cliente.sexo || '-' }}</td>
+        <td>
+          <button class="btn btn-secondary" (click)="editarCliente(cliente.id!)" style="margin-right: 5px;">
+            Editar
+          </button>
+          <button class="btn btn-danger" (click)="excluirCliente(cliente.id!)">
+            Excluir
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

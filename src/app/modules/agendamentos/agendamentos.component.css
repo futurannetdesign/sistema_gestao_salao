@@ -1,0 +1,75 @@
+.header-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 5px;
+}
+
+.view-toggle .btn {
+  padding: 8px 15px;
+}
+
+.filters-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.filter-select {
+  width: 200px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.status-select {
+  padding: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.calendario-view {
+  margin-top: 20px;
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.calendario-item {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: var(--shadow);
+}
+
+.calendario-data {
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
+
+.calendario-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.calendario-actions {
+  display: flex;
+  gap: 5px;
+}
+

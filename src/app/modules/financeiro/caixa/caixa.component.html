@@ -1,0 +1,84 @@
+<div class="page-header">
+  <h1>💵 Caixa</h1>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="resumo-cards">
+  <div class="resumo-card">
+    <h3>Saldo Atual</h3>
+    <p class="valor" [ngClass]="saldoAtual >= 0 ? 'valor-positivo' : 'valor-negativo'">
+      {{ formatarMoeda(saldoAtual) }}
+    </p>
+  </div>
+  <div class="resumo-card">
+    <h3>Total Entradas</h3>
+    <p class="valor valor-entrada">{{ formatarMoeda(totalEntradas) }}</p>
+  </div>
+  <div class="resumo-card">
+    <h3>Total Saídas</h3>
+    <p class="valor valor-saida">{{ formatarMoeda(totalSaidas) }}</p>
+  </div>
+  <div class="resumo-card">
+    <h3>Saldo do Dia</h3>
+    <p class="valor" [ngClass]="saldoDia >= 0 ? 'valor-positivo' : 'valor-negativo'">
+      {{ formatarMoeda(saldoDia) }}
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="filters-bar">
+    <input
+      type="date"
+      [(ngModel)]="dataFiltro"
+      (change)="filtrarMovimentacoes()"
+      class="filter-select"
+    />
+    <select [(ngModel)]="tipoFiltro" (change)="filtrarMovimentacoes()" class="filter-select">
+      <option value="">Todos os tipos</option>
+      <option value="entrada">Entradas</option>
+      <option value="saida">Saídas</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando movimentações...
+  </div>
+
+  <div *ngIf="!loading && movimentacoesFiltradas.length === 0" class="empty-state">
+    <p>Nenhuma movimentação encontrada.</p>
+  </div>
+
+  <table *ngIf="!loading && movimentacoesFiltradas.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Tipo</th>
+        <th>Descrição</th>
+        <th>Valor</th>
+        <th>Forma Pagamento</th>
+        <th>Observações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let movimentacao of movimentacoesFiltradas">
+        <td>{{ formatarData(movimentacao.data_movimentacao) }}</td>
+        <td>
+          <span class="badge" [ngClass]="getTipoBadgeClass(movimentacao.tipo)">
+            {{ getTipoLabel(movimentacao.tipo) }}
+          </span>
+        </td>
+        <td>{{ movimentacao.descricao }}</td>
+        <td [ngClass]="movimentacao.tipo === 'entrada' ? 'valor-entrada' : 'valor-saida'">
+          {{ movimentacao.tipo === 'entrada' ? '+' : '-' }}{{ formatarMoeda(movimentacao.valor) }}
+        </td>
+        <td>{{ movimentacao.forma_pagamento || '-' }}</td>
+        <td>{{ movimentacao.observacoes || '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

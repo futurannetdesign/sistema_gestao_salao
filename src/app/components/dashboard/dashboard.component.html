@@ -1,0 +1,96 @@
+<div class="dashboard">
+  <h1>📊 Dashboard</h1>
+
+  <div *ngIf="loading" class="loading">
+    Carregando dados...
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Cards de Estatísticas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <h3>Total de Clientes</h3>
+          <p class="stat-value">{{ totalClientes }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info">
+          <h3>Agendamentos Hoje</h3>
+          <p class="stat-value">{{ totalAgendamentosHoje }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+          <h3>Agendamentos Pendentes</h3>
+          <p class="stat-value">{{ totalAgendamentosPendentes }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <h3>Receita do Mês</h3>
+          <p class="stat-value valor-positivo">{{ formatarMoeda(receitaMes) }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💸</div>
+        <div class="stat-info">
+          <h3>Despesas do Mês</h3>
+          <p class="stat-value valor-negativo">{{ formatarMoeda(despesaMes) }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💵</div>
+        <div class="stat-info">
+          <h3>Saldo do Mês</h3>
+          <p class="stat-value" [ngClass]="saldoMes >= 0 ? 'valor-positivo' : 'valor-negativo'">
+            {{ formatarMoeda(saldoMes) }}
+          </p>
+        </div>
+      </div>
+
+      <div class="stat-card alert-card" *ngIf="produtosBaixoEstoque > 0">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-info">
+          <h3>Produtos com Estoque Baixo</h3>
+          <p class="stat-value valor-alerta">{{ produtosBaixoEstoque }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card alert-card" *ngIf="contasVencidas > 0">
+        <div class="stat-icon">🚨</div>
+        <div class="stat-info">
+          <h3>Contas Vencidas</h3>
+          <p class="stat-value valor-alerta">{{ contasVencidas }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agendamentos do Dia -->
+    <div class="card">
+      <h2>📅 Agendamentos de Hoje</h2>
+      <div *ngIf="agendamentosHoje.length === 0" class="empty-state">
+        <p>Nenhum agendamento para hoje.</p>
+      </div>
+      <div *ngIf="agendamentosHoje.length > 0" class="agendamentos-list">
+        <div *ngFor="let agendamento of agendamentosHoje" class="agendamento-item">
+          <div class="agendamento-hora">{{ formatarDataHora(agendamento.data_hora) }}</div>
+          <div class="agendamento-info">
+            <strong>{{ agendamento.cliente?.nome || 'Cliente não encontrado' }}</strong>
+            <span>{{ agendamento.servico?.nome || 'Serviço não encontrado' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

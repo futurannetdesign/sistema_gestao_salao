@@ -1,0 +1,104 @@
+.dashboard h1 {
+  color: var(--primary-color);
+  margin-bottom: 30px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--white);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-card.alert-card {
+  border-left: 4px solid var(--warning-color);
+}
+
+.stat-icon {
+  font-size: 40px;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.valor-positivo {
+  color: var(--success-color);
+}
+
+.valor-negativo {
+  color: var(--danger-color);
+}
+
+.valor-alerta {
+  color: var(--warning-color);
+}
+
+.agendamentos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.agendamento-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 15px;
+  background: var(--light-color);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.agendamento-hora {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-color);
+  min-width: 80px;
+}
+
+.agendamento-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.agendamento-info strong {
+  font-size: 16px;
+}
+
+.agendamento-info span {
+  color: #666;
+  font-size: 14px;
+}
+

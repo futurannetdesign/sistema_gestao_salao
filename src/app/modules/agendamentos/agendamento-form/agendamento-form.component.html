@@ -1,0 +1,86 @@
+<div class="page-header">
+  <h1>{{ agendamentoId ? 'Editar' : 'Novo' }} Agendamento</h1>
+  <button class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <form [formGroup]="agendamentoForm" (ngSubmit)="salvar()">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cliente *</label>
+        <select formControlName="cliente_id" class="form-control">
+          <option value="">Selecione um cliente</option>
+          <option *ngFor="let cliente of clientes" [value]="cliente.id">{{ cliente.nome }}</option>
+        </select>
+        <span *ngIf="agendamentoForm.get('cliente_id')?.invalid && agendamentoForm.get('cliente_id')?.touched" class="error-message">
+          Cliente é obrigatório
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Serviço *</label>
+        <select formControlName="servico_id" class="form-control" (change)="onServicoChange()">
+          <option value="">Selecione um serviço</option>
+          <option *ngFor="let servico of servicos" [value]="servico.id">
+            {{ servico.nome }} - {{ servico.categoria }}
+          </option>
+        </select>
+        <span *ngIf="agendamentoForm.get('servico_id')?.invalid && agendamentoForm.get('servico_id')?.touched" class="error-message">
+          Serviço é obrigatório
+        </span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Profissional</label>
+        <select formControlName="profissional_id" class="form-control">
+          <option value="">Selecione um profissional</option>
+          <option *ngFor="let profissional of profissionais" [value]="profissional.id">
+            {{ profissional.nome }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data e Hora *</label>
+        <input type="datetime-local" formControlName="data_hora" class="form-control" />
+        <span *ngIf="agendamentoForm.get('data_hora')?.invalid && agendamentoForm.get('data_hora')?.touched" class="error-message">
+          Data e hora são obrigatórias
+        </span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Status</label>
+        <select formControlName="status" class="form-control">
+          <option value="agendado">Agendado</option>
+          <option value="concluido">Concluído</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Valor Cobrado (R$)</label>
+        <input type="number" formControlName="valor_cobrado" class="form-control" step="0.01" min="0" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Observações</label>
+      <textarea formControlName="observacoes" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || agendamentoForm.invalid">
+        {{ loading ? 'Salvando...' : (agendamentoId ? 'Atualizar' : 'Salvar') }}
+      </button>
+    </div>
+  </form>
+</div>
+

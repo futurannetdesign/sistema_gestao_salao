@@ -1,0 +1,102 @@
+<div class="page-header">
+  <h1>📤 Contas a Pagar</h1>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="resumo-cards">
+  <div class="resumo-card">
+    <h3>Total Pendente</h3>
+    <p class="valor valor-pendente">{{ formatarMoeda(totalPendente) }}</p>
+  </div>
+  <div class="resumo-card">
+    <h3>Total Pago</h3>
+    <p class="valor valor-pago">{{ formatarMoeda(totalPago) }}</p>
+  </div>
+  <div class="resumo-card">
+    <h3>Total Vencido</h3>
+    <p class="valor valor-vencido">{{ formatarMoeda(totalVencido) }}</p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="filters-bar">
+    <input
+      type="text"
+      placeholder="Buscar por descrição..."
+      [(ngModel)]="searchTerm"
+      (input)="filtrarContas()"
+      class="search-input"
+    />
+    <select [(ngModel)]="statusFiltro" (change)="filtrarContas()" class="filter-select">
+      <option value="">Todos os status</option>
+      <option value="pendente">Pendente</option>
+      <option value="pago">Pago</option>
+      <option value="vencido">Vencido</option>
+    </select>
+    <select [(ngModel)]="categoriaFiltro" (change)="filtrarContas()" class="filter-select">
+      <option value="">Todas as categorias</option>
+      <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+    </select>
+    <select [(ngModel)]="periodoFiltro" (change)="filtrarContas()" class="filter-select">
+      <option value="dia">Hoje</option>
+      <option value="semana">Última Semana</option>
+      <option value="mes">Último Mês</option>
+      <option value="todos">Todos</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando contas...
+  </div>
+
+  <div *ngIf="!loading && contasFiltradas.length === 0" class="empty-state">
+    <p>Nenhuma conta encontrada.</p>
+  </div>
+
+  <table *ngIf="!loading && contasFiltradas.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th>Categoria</th>
+        <th>Valor</th>
+        <th>Vencimento</th>
+        <th>Pagamento</th>
+        <th>Forma Pagamento</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let conta of contasFiltradas">
+        <td>{{ conta.descricao }}</td>
+        <td>{{ conta.categoria }}</td>
+        <td>{{ formatarMoeda(conta.valor) }}</td>
+        <td>{{ formatarData(conta.data_vencimento) }}</td>
+        <td>{{ conta.data_pagamento ? formatarData(conta.data_pagamento) : '-' }}</td>
+        <td>{{ conta.forma_pagamento || '-' }}</td>
+        <td>
+          <span class="badge" [ngClass]="getStatusBadgeClass(conta.status)">
+            {{ getStatusLabel(conta.status) }}
+          </span>
+        </td>
+        <td>
+          <button 
+            *ngIf="conta.status !== 'pago'" 
+            class="btn btn-success" 
+            (click)="marcarComoPago(conta.id!)"
+            style="margin-right: 5px;"
+          >
+            Marcar como Pago
+          </button>
+          <button class="btn btn-danger" (click)="excluirConta(conta.id!)">
+            Excluir
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

@@ -1,0 +1,71 @@
+<div class="page-header">
+  <h1>{{ servicoId ? 'Editar' : 'Novo' }} Serviço</h1>
+  <button class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <form [formGroup]="servicoForm" (ngSubmit)="salvar()">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome do Serviço *</label>
+        <input type="text" formControlName="nome" class="form-control" />
+        <span *ngIf="servicoForm.get('nome')?.invalid && servicoForm.get('nome')?.touched" class="error-message">
+          Nome é obrigatório
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Categoria *</label>
+        <select formControlName="categoria" class="form-control">
+          <option value="">Selecione</option>
+          <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+        </select>
+        <span *ngIf="servicoForm.get('categoria')?.invalid && servicoForm.get('categoria')?.touched" class="error-message">
+          Categoria é obrigatória
+        </span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Valor Padrão (R$) *</label>
+        <input type="number" formControlName="valor_padrao" class="form-control" step="0.01" min="0" />
+        <span *ngIf="servicoForm.get('valor_padrao')?.invalid && servicoForm.get('valor_padrao')?.touched" class="error-message">
+          Valor deve ser maior que zero
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Duração Estimada (minutos) *</label>
+        <input type="number" formControlName="duracao_estimada" class="form-control" min="1" />
+        <span *ngIf="servicoForm.get('duracao_estimada')?.invalid && servicoForm.get('duracao_estimada')?.touched" class="error-message">
+          Duração deve ser maior que zero
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Observações</label>
+      <textarea formControlName="observacoes" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" formControlName="ativo" />
+        Serviço ativo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || servicoForm.invalid">
+        {{ loading ? 'Salvando...' : (servicoId ? 'Atualizar' : 'Salvar') }}
+      </button>
+    </div>
+  </form>
+</div>
+
