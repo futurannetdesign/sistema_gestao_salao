@@ -55,3 +55,9 @@ src/environments/environment.prod.ts
 !src/environments/environment.example.ts
 !src/environments/environment.prod.example.ts
 
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
