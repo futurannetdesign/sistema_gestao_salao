@@ -41,8 +41,7 @@ export class ClientesComponent implements OnInit {
     const termo = this.searchTerm.toLowerCase();
     this.clientesFiltrados = this.clientes.filter(cliente =>
       cliente.nome.toLowerCase().includes(termo) ||
-      cliente.celular?.toLowerCase().includes(termo) ||
-      cliente.email?.toLowerCase().includes(termo)
+      cliente.celular?.toLowerCase().includes(termo)
     );
   }
 

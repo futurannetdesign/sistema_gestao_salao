@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SupabaseService } from '../../../services/supabase.service';
-import { Agendamento, Profissional } from '../../../models/agendamento.model';
+import { Agendamento } from '../../../models/agendamento.model';
+import { Profissional } from '../../../models/profissional.model';
 import { Cliente } from '../../../models/cliente.model';
 import { Servico } from '../../../models/servico.model';
 
@@ -34,7 +35,7 @@ export class AgendamentoFormComponent implements OnInit {
       data_hora: ['', Validators.required],
       status: ['agendado'],
       observacoes: [''],
-      valor_cobrado: ['']
+      valor_cobrado: ['', [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -109,9 +110,20 @@ export class AgendamentoFormComponent implements OnInit {
   onServicoChange() {
     const servicoId = this.agendamentoForm.get('servico_id')?.value;
     const servico = this.servicos.find(s => s.id === servicoId);
-    if (servico && !this.agendamentoForm.get('valor_cobrado')?.value) {
+    if (servico && servico.valor_padrao) {
+      // Sempre preencher o valor do serviço quando selecionar
       this.agendamentoForm.patchValue({ valor_cobrado: servico.valor_padrao });
     }
+  }
+  
+  getServicoSelecionado(): Servico | undefined {
+    const servicoId = this.agendamentoForm.get('servico_id')?.value;
+    return this.servicos.find(s => s.id === servicoId);
+  }
+  
+  formatarMoeda(valor: number | undefined): string {
+    if (!valor) return 'R$ 0,00';
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }
 
   async salvar() {

@@ -11,7 +11,7 @@
   <div class="search-bar">
     <input
       type="text"
-      placeholder="Buscar por nome, celular ou e-mail..."
+      placeholder="Buscar por nome ou celular..."
       [(ngModel)]="searchTerm"
       (input)="filtrarClientes()"
       class="search-input"
@@ -32,8 +32,6 @@
         <th>Nome</th>
         <th>Celular</th>
         <th>WhatsApp</th>
-        <th>E-mail</th>
-        <th>Data Nascimento</th>
         <th>Sexo</th>
         <th>Ações</th>
       </tr>
@@ -43,11 +41,9 @@
         <td>{{ cliente.nome }}</td>
         <td>{{ formatarTelefone(cliente.celular) }}</td>
         <td>{{ formatarTelefone(cliente.whatsapp) }}</td>
-        <td>{{ cliente.email || '-' }}</td>
-        <td>{{ formatarData(cliente.data_nascimento) }}</td>
         <td>{{ cliente.sexo || '-' }}</td>
         <td>
-          <button class="btn btn-secondary" (click)="editarCliente(cliente.id!)" style="margin-right: 5px;">
+          <button class="btn btn-edit" (click)="editarCliente(cliente.id!)" style="margin-right: 5px;">
             Editar
           </button>
           <button class="btn btn-danger" (click)="excluirCliente(cliente.id!)">

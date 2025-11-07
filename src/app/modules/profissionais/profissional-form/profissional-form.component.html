@@ -1,0 +1,67 @@
+<div class="page-header">
+  <h1>{{ profissionalId ? 'Editar' : 'Novo' }} Profissional</h1>
+  <button class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <form [formGroup]="profissionalForm" (ngSubmit)="salvar()">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome Completo *</label>
+        <input type="text" formControlName="nome" class="form-control" />
+        <span *ngIf="profissionalForm.get('nome')?.invalid && profissionalForm.get('nome')?.touched" class="error-message">
+          Nome é obrigatório
+        </span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Celular</label>
+        <input type="text" formControlName="celular" class="form-control" placeholder="(00) 00000-0000" />
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" formControlName="email" class="form-control" />
+        <span *ngIf="profissionalForm.get('email')?.invalid && profissionalForm.get('email')?.touched" class="error-message">
+          E-mail inválido
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Especialidades</label>
+      <div class="especialidades-grid">
+        <label *ngFor="let especialidade of especialidades" class="checkbox-label">
+          <input
+            type="checkbox"
+            [checked]="isEspecialidadeSelecionada(especialidade)"
+            (change)="toggleEspecialidade(especialidade)"
+          />
+          <span>{{ especialidade }}</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" formControlName="ativo" />
+        Profissional ativo
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || profissionalForm.invalid">
+        {{ loading ? 'Salvando...' : (profissionalId ? 'Atualizar' : 'Salvar') }}
+      </button>
+    </div>
+  </form>
+</div>
+

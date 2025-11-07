@@ -26,8 +26,6 @@ export class ClienteFormComponent implements OnInit {
       nome: ['', Validators.required],
       celular: [''],
       whatsapp: [''],
-      email: ['', Validators.email],
-      data_nascimento: [''],
       sexo: [''],
       observacoes: ['']
     });
@@ -51,8 +49,6 @@ export class ClienteFormComponent implements OnInit {
           nome: cliente.nome,
           celular: cliente.celular || '',
           whatsapp: cliente.whatsapp || '',
-          email: cliente.email || '',
-          data_nascimento: cliente.data_nascimento || '',
           sexo: cliente.sexo || '',
           observacoes: cliente.observacoes || ''
         });

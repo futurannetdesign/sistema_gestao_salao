@@ -4,7 +4,24 @@
       <button class="menu-toggle" (click)="toggleMenu()">
         <span>☰</span>
       </button>
-      <h1 class="logo">💈 Sistema de Gestão</h1>
+      
+      <div class="logo-container">
+        <div class="logo-wrapper">
+          <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="logo-image" />
+          <h1 *ngIf="!logoUrl" class="logo-text">{{ nomeSalao }}</h1>
+        </div>
+      </div>
+      
+      <div class="header-info">
+        <div class="data-hora">
+          <span class="dia-semana">{{ diaSemana }}</span>
+          <span class="separador">|</span>
+          <span class="data">{{ dataFormatada }}</span>
+          <span class="separador">|</span>
+          <span class="hora">{{ horaFormatada }}</span>
+        </div>
+      </div>
+      
       <nav class="header-nav">
         <a routerLink="/dashboard">Dashboard</a>
       </nav>
@@ -22,6 +39,9 @@
         </a>
         <a routerLink="/servicos" routerLinkActive="active" (click)="menuOpen = false">
           <span>✂️</span> Serviços
+        </a>
+        <a routerLink="/profissionais" routerLinkActive="active" (click)="menuOpen = false">
+          <span>👨‍💼</span> Profissionais
         </a>
         <a routerLink="/agendamentos" routerLinkActive="active" (click)="menuOpen = false">
           <span>📅</span> Agendamentos

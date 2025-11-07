@@ -59,6 +59,15 @@ body {
   color: var(--white);
 }
 
+.btn-edit {
+  background-color: #9C27B0;
+  color: var(--white);
+}
+
+.btn-edit:hover {
+  background-color: #7B1FA2;
+}
+
 .btn-success {
   background-color: var(--success-color);
   color: var(--white);

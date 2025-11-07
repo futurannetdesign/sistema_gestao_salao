@@ -92,7 +92,7 @@ export class EstoqueComponent implements OnInit {
   }
 
   isBaixoEstoque(produto: Produto): boolean {
-    return produto.ativo && produto.quantidade_atual <= produto.quantidade_minima;
+    return (produto.ativo ?? false) && produto.quantidade_atual <= produto.quantidade_minima;
   }
 
   formatarMoeda(valor: number | undefined): string {

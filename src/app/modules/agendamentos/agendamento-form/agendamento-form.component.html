@@ -25,12 +25,15 @@
         <select formControlName="servico_id" class="form-control" (change)="onServicoChange()">
           <option value="">Selecione um serviço</option>
           <option *ngFor="let servico of servicos" [value]="servico.id">
-            {{ servico.nome }} - {{ servico.categoria }}
+            {{ servico.nome }} - {{ servico.categoria }} ({{ formatarMoeda(servico.valor_padrao) }})
           </option>
         </select>
         <span *ngIf="agendamentoForm.get('servico_id')?.invalid && agendamentoForm.get('servico_id')?.touched" class="error-message">
           Serviço é obrigatório
         </span>
+        <small *ngIf="getServicoSelecionado()" class="form-help">
+          Valor padrão: <strong>{{ formatarMoeda(getServicoSelecionado()?.valor_padrao) }}</strong>
+        </small>
       </div>
     </div>
 
@@ -63,8 +66,11 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Valor Cobrado (R$)</label>
-        <input type="number" formControlName="valor_cobrado" class="form-control" step="0.01" min="0" />
+        <label>Valor Cobrado (R$) *</label>
+        <input type="number" formControlName="valor_cobrado" class="form-control" step="0.01" min="0" required />
+        <small *ngIf="getServicoSelecionado()" class="form-help">
+          Valor será preenchido automaticamente ao selecionar o serviço. Você pode alterar se necessário.
+        </small>
       </div>
     </div>
 

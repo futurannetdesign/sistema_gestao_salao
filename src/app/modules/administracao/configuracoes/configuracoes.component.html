@@ -37,6 +37,34 @@
       <input type="text" formControlName="horario_funcionamento" class="form-control" placeholder="Ex: Segunda a Sexta: 8h às 18h" />
     </div>
 
+    <h2 style="margin-top: 30px;">Logo do Salão</h2>
+
+    <div class="form-group">
+      <label>Logo da Empresa</label>
+      <div class="logo-upload-area">
+        <div *ngIf="logoPreview || configForm.get('logo_url')?.value" class="logo-preview">
+          <img [src]="logoPreview || configForm.get('logo_url')?.value" alt="Logo Preview" />
+          <button type="button" class="btn btn-danger btn-small" (click)="removerLogo()">Remover Logo</button>
+        </div>
+        <div *ngIf="!logoPreview && !configForm.get('logo_url')?.value" class="logo-upload-placeholder">
+          <p>Nenhuma logo cadastrada</p>
+          <p class="logo-hint">Formatos aceitos: JPEG, PNG, GIF, WEBP, SVG</p>
+          <p class="logo-hint">Tamanho máximo: 5MB</p>
+        </div>
+        <input
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
+          (change)="onLogoChange($event)"
+          class="logo-input"
+          id="logo-upload"
+        />
+        <label for="logo-upload" class="btn btn-secondary">
+          {{ logoPreview || configForm.get('logo_url')?.value ? 'Alterar Logo' : 'Selecionar Logo' }}
+        </label>
+      </div>
+      <small class="form-help">A logo aparecerá no cabeçalho do sistema. Se não houver logo, será exibido o nome do salão.</small>
+    </div>
+
     <h2 style="margin-top: 30px;">Integrações</h2>
 
     <div class="form-group">

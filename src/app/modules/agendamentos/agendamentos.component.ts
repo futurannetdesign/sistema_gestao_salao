@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 import { Agendamento } from '../../models/agendamento.model';
 import { Cliente } from '../../models/cliente.model';
 import { Servico } from '../../models/servico.model';
-import { Profissional } from '../../models/agendamento.model';
+import { Profissional } from '../../models/profissional.model';
 
 @Component({
   selector: 'app-agendamentos',
@@ -27,7 +27,8 @@ export class AgendamentosComponent implements OnInit {
 
   constructor(
     private supabase: SupabaseService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
@@ -44,8 +45,21 @@ export class AgendamentosComponent implements OnInit {
       this.loading = true;
       const agendamentos = await this.supabase.select('agendamentos') as Agendamento[];
       
-      // Carregar dados relacionados
+      // Carregar dados relacionados e garantir que o status está correto
       for (const agendamento of agendamentos) {
+        // Garantir que o status existe e está no formato correto
+        if (!agendamento.status) {
+          agendamento.status = 'agendado';
+        }
+        
+        // Normalizar o status para garantir consistência
+        const statusNormalizado = agendamento.status.trim().toLowerCase();
+        if (statusNormalizado === 'agendado' || statusNormalizado === 'concluido' || statusNormalizado === 'cancelado') {
+          agendamento.status = statusNormalizado as 'agendado' | 'concluido' | 'cancelado';
+        } else {
+          agendamento.status = 'agendado'; // Valor padrão se inválido
+        }
+        
         if (agendamento.cliente_id) {
           const clientes = await this.supabase.select('clientes', { id: agendamento.cliente_id });
           agendamento.cliente = clientes?.[0] as Cliente;
@@ -63,6 +77,7 @@ export class AgendamentosComponent implements OnInit {
       this.agendamentos = agendamentos;
       this.filtrarAgendamentos();
       this.loading = false;
+      this.cdr.detectChanges(); // Forçar detecção de mudanças
     } catch (error: any) {
       this.showAlert('Erro ao carregar agendamentos: ' + error.message, 'danger');
       this.loading = false;
@@ -94,30 +109,48 @@ export class AgendamentosComponent implements OnInit {
   }
 
   filtrarAgendamentos() {
-    let filtrados = this.agendamentos;
+    let filtrados = [...this.agendamentos]; // Criar cópia para não modificar o array original
 
-    if (this.searchTerm) {
-      const termo = this.searchTerm.toLowerCase();
+    // Filtro por busca de texto
+    if (this.searchTerm && this.searchTerm.trim() !== '') {
+      const termo = this.searchTerm.trim().toLowerCase();
       filtrados = filtrados.filter(agendamento =>
-        agendamento.cliente?.nome.toLowerCase().includes(termo) ||
-        agendamento.servico?.nome.toLowerCase().includes(termo)
+        agendamento.cliente?.nome?.toLowerCase().includes(termo) ||
+        agendamento.servico?.nome?.toLowerCase().includes(termo)
       );
     }
 
-    if (this.statusFiltro) {
-      filtrados = filtrados.filter(agendamento => agendamento.status === this.statusFiltro);
-    }
-
-    if (this.dataFiltro) {
+    // Filtro por status - comparação exata e case-sensitive
+    if (this.statusFiltro && this.statusFiltro.trim() !== '') {
+      const statusFiltro = this.statusFiltro.trim();
       filtrados = filtrados.filter(agendamento => {
-        const dataAgendamento = new Date(agendamento.data_hora).toISOString().split('T')[0];
-        return dataAgendamento === this.dataFiltro;
+        if (!agendamento.status) return false;
+        // Comparação exata do status
+        return agendamento.status === statusFiltro;
       });
     }
 
-    this.agendamentosFiltrados = filtrados.sort((a, b) => 
-      new Date(a.data_hora).getTime() - new Date(b.data_hora).getTime()
-    );
+    // Filtro por data
+    if (this.dataFiltro && this.dataFiltro.trim() !== '') {
+      filtrados = filtrados.filter(agendamento => {
+        if (!agendamento.data_hora) return false;
+        try {
+          const dataAgendamento = new Date(agendamento.data_hora).toISOString().split('T')[0];
+          return dataAgendamento === this.dataFiltro;
+        } catch {
+          return false;
+        }
+      });
+    }
+
+    // Ordenar por data/hora
+    this.agendamentosFiltrados = filtrados.sort((a, b) => {
+      try {
+        return new Date(a.data_hora).getTime() - new Date(b.data_hora).getTime();
+      } catch {
+        return 0;
+      }
+    });
   }
 
   novoAgendamento() {
@@ -130,12 +163,44 @@ export class AgendamentosComponent implements OnInit {
 
   async atualizarStatus(id: number, novoStatus: string) {
     try {
-      await this.supabase.update('agendamentos', id, { status: novoStatus });
+      // Normalizar o status antes de salvar
+      const statusNormalizado = novoStatus.trim().toLowerCase();
+      if (statusNormalizado !== 'agendado' && statusNormalizado !== 'concluido' && statusNormalizado !== 'cancelado') {
+        this.showAlert('Status inválido!', 'danger');
+        return;
+      }
+      
+      // Atualizar o status localmente ANTES de salvar para feedback imediato
+      const agendamento = this.agendamentos.find(a => a.id === id);
+      const agendamentoFiltrado = this.agendamentosFiltrados.find(a => a.id === id);
+      
+      if (agendamento) {
+        agendamento.status = statusNormalizado as 'agendado' | 'concluido' | 'cancelado';
+      }
+      if (agendamentoFiltrado) {
+        agendamentoFiltrado.status = statusNormalizado as 'agendado' | 'concluido' | 'cancelado';
+      }
+      
+      // Forçar detecção de mudanças imediatamente
+      this.cdr.detectChanges();
+      
+      // Salvar no banco
+      await this.supabase.update('agendamentos', id, { status: statusNormalizado });
+      
+      // Reaplicar filtros para atualizar a lista
+      this.filtrarAgendamentos();
+      
       this.showAlert('Status atualizado com sucesso!', 'success');
-      await this.carregarAgendamentos();
     } catch (error: any) {
       this.showAlert('Erro ao atualizar status: ' + error.message, 'danger');
+      // Recarregar em caso de erro
+      await this.carregarAgendamentos();
     }
+  }
+  
+  onStatusChange(agendamentoId: number | undefined, novoStatus: string) {
+    if (!agendamentoId) return;
+    this.atualizarStatus(agendamentoId, novoStatus);
   }
 
   async excluirAgendamento(id: number) {
@@ -193,5 +258,10 @@ export class AgendamentosComponent implements OnInit {
       this.alertMessage = '';
     }, 5000);
   }
+
+  trackByAgendamentoId(index: number, agendamento: Agendamento): number {
+    return agendamento.id || index;
+  }
+
 }
 

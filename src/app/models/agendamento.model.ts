@@ -1,14 +1,6 @@
 import { Cliente } from './cliente.model';
 import { Servico } from './servico.model';
-
-export interface Profissional {
-  id?: number;
-  nome: string;
-  celular?: string;
-  email?: string;
-  especialidades?: string[];
-  ativo?: boolean;
-}
+import { Profissional } from './profissional.model';
 
 export interface Agendamento {
   id?: number;

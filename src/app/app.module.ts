@@ -16,6 +16,8 @@ import { ContasPagarComponent } from './modules/financeiro/contas-pagar/contas-p
 import { CaixaComponent } from './modules/financeiro/caixa/caixa.component';
 import { EstoqueComponent } from './modules/estoque/estoque.component';
 import { ProdutoFormComponent } from './modules/estoque/produto-form/produto-form.component';
+import { ProfissionaisComponent } from './modules/profissionais/profissionais.component';
+import { ProfissionalFormComponent } from './modules/profissionais/profissional-form/profissional-form.component';
 import { ConfiguracoesComponent } from './modules/administracao/configuracoes/configuracoes.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { SupabaseService } from './services/supabase.service';
@@ -29,6 +31,9 @@ const routes: Routes = [
   { path: 'servicos', component: ServicosComponent },
   { path: 'servicos/novo', component: ServicoFormComponent },
   { path: 'servicos/editar/:id', component: ServicoFormComponent },
+  { path: 'profissionais', component: ProfissionaisComponent },
+  { path: 'profissionais/novo', component: ProfissionalFormComponent },
+  { path: 'profissionais/editar/:id', component: ProfissionalFormComponent },
   { path: 'agendamentos', component: AgendamentosComponent },
   { path: 'agendamentos/novo', component: AgendamentoFormComponent },
   { path: 'agendamentos/editar/:id', component: AgendamentoFormComponent },
@@ -57,6 +62,8 @@ const routes: Routes = [
     CaixaComponent,
     EstoqueComponent,
     ProdutoFormComponent,
+    ProfissionaisComponent,
+    ProfissionalFormComponent,
     ConfiguracoesComponent
   ],
   imports: [

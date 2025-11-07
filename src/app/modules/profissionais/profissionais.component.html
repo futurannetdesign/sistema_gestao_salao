@@ -1,0 +1,63 @@
+<div class="page-header">
+  <h1>👨‍💼 Profissionais</h1>
+  <button class="btn btn-primary" (click)="novoProfissional()">+ Novo Profissional</button>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Buscar por nome, celular, e-mail ou especialidade..."
+      [(ngModel)]="searchTerm"
+      (input)="filtrarProfissionais()"
+      class="search-input"
+    />
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando profissionais...
+  </div>
+
+  <div *ngIf="!loading && profissionaisFiltrados.length === 0" class="empty-state">
+    <p>Nenhum profissional encontrado.</p>
+  </div>
+
+  <table *ngIf="!loading && profissionaisFiltrados.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Celular</th>
+        <th>E-mail</th>
+        <th>Especialidades</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let profissional of profissionaisFiltrados">
+        <td>{{ profissional.nome }}</td>
+        <td>{{ formatarTelefone(profissional.celular) }}</td>
+        <td>{{ profissional.email || '-' }}</td>
+        <td>{{ formatarEspecialidades(profissional.especialidades) }}</td>
+        <td>
+          <span class="badge" [class.badge-success]="profissional.ativo" [class.badge-danger]="!profissional.ativo">
+            {{ profissional.ativo ? 'Ativo' : 'Inativo' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-edit" (click)="editarProfissional(profissional.id!)" style="margin-right: 5px;">
+            Editar
+          </button>
+          <button class="btn btn-danger" (click)="excluirProfissional(profissional.id!)">
+            Excluir
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

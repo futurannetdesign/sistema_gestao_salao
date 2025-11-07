@@ -18,6 +18,7 @@
   display: flex;
   align-items: center;
   gap: 20px;
+  justify-content: space-between;
 }
 
 .menu-toggle {
@@ -30,10 +31,69 @@
   display: none;
 }
 
-.logo {
+.logo-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-image {
+  max-height: 50px;
+  max-width: 200px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.logo-text {
   font-size: 24px;
   margin: 0;
-  flex: 1;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.header-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.data-hora {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--white);
+  white-space: nowrap;
+}
+
+.dia-semana {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.data {
+  opacity: 0.9;
+}
+
+.separador {
+  opacity: 0.5;
+  font-size: 12px;
+  margin: 0 5px;
+}
+
+.hora {
+  font-weight: 600;
+  font-size: 16px;
+  font-family: 'Courier New', monospace;
 }
 
 .header-nav {
@@ -51,6 +111,44 @@
 
 .header-nav a:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .header-info {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-wrap: wrap;
+  }
+  
+  .logo-container {
+    order: 2;
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .header-info {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-top: 5px;
+  }
+  
+  .header-nav {
+    order: 4;
+    flex: 1 1 100%;
+    justify-content: center;
+    margin-top: 5px;
+  }
+  
+  .data-hora {
+    align-items: center;
+    text-align: center;
+  }
 }
 
 .main-container {

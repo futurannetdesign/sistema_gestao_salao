@@ -11,24 +11,6 @@
   border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
-  box-sizing: border-box;
-  max-width: 100%;
-}
-
-.form-group {
-  min-width: 0;
-  overflow: hidden;
-}
-
-@media (max-width: 768px) {
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .form-control {
-    font-size: 16px; /* Evita zoom no mobile */
-  }
 }
 
 .error-message {
@@ -36,14 +18,6 @@
   font-size: 12px;
   display: block;
   margin-top: 5px;
-}
-
-.form-help {
-  display: block;
-  margin-top: 5px;
-  color: #666;
-  font-size: 12px;
-  font-style: italic;
 }
 
 .form-actions {
@@ -57,5 +31,35 @@
 
 .form-actions .btn {
   min-width: 120px;
+}
+
+.especialidades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.checkbox-label:hover {
+  background-color: var(--light-color);
+}
+
+.checkbox-label input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.checkbox-label span {
+  user-select: none;
 }
 

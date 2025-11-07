@@ -2,10 +2,10 @@
   <h1>📅 Agendamentos</h1>
   <div class="header-actions">
     <div class="view-toggle">
-      <button class="btn" [class.btn-primary]="viewMode === 'lista'" [class.btn-secondary]="viewMode !== 'lista'" (click)="viewMode = 'lista'">
+      <button class="btn" [class.btn-primary]="viewMode === 'lista'" [class.btn-edit]="viewMode !== 'lista'" (click)="viewMode = 'lista'">
         Lista
       </button>
-      <button class="btn" [class.btn-primary]="viewMode === 'calendario'" [class.btn-secondary]="viewMode !== 'calendario'" (click)="viewMode = 'calendario'">
+      <button class="btn" [class.btn-primary]="viewMode === 'calendario'" [class.btn-edit]="viewMode !== 'calendario'" (click)="viewMode = 'calendario'">
         Calendário
       </button>
     </div>
@@ -62,7 +62,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let agendamento of agendamentosFiltrados">
+        <tr *ngFor="let agendamento of agendamentosFiltrados; trackBy: trackByAgendamentoId">
           <td>{{ agendamento.cliente?.nome || '-' }}</td>
           <td>{{ agendamento.servico?.nome || '-' }}</td>
           <td>{{ agendamento.profissional?.nome || '-' }}</td>
@@ -74,17 +74,24 @@
             </span>
           </td>
           <td>
-            <select (change)="atualizarStatus(agendamento.id!, $any($event.target).value)" [value]="agendamento.status" class="status-select">
-              <option value="agendado">Agendado</option>
-              <option value="concluido">Concluído</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
-            <button class="btn btn-secondary" (click)="editarAgendamento(agendamento.id!)" style="margin: 5px;">
-              Editar
-            </button>
-            <button class="btn btn-danger" (click)="excluirAgendamento(agendamento.id!)">
-              Excluir
-            </button>
+            <div class="actions-cell">
+              <select 
+                [value]="agendamento.status || 'agendado'" 
+                (change)="onStatusChange(agendamento.id, $any($event.target).value)" 
+                class="status-select"
+                [id]="'status-select-' + agendamento.id"
+                [attr.data-status]="agendamento.status">
+                <option value="agendado">Agendado</option>
+                <option value="concluido">Concluído</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+              <button class="btn btn-edit btn-small" (click)="editarAgendamento(agendamento.id!)">
+                Editar
+              </button>
+              <button class="btn btn-danger btn-small" (click)="excluirAgendamento(agendamento.id!)">
+                Excluir
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -103,7 +110,7 @@
           </span>
         </div>
         <div class="calendario-actions">
-          <button class="btn btn-secondary" (click)="editarAgendamento(agendamento.id!)">Editar</button>
+          <button class="btn btn-edit" (click)="editarAgendamento(agendamento.id!)">Editar</button>
         </div>
       </div>
     </div>
