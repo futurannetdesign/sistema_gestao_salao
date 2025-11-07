@@ -1,11 +1,7 @@
 {
   "hosting": {
     "public": "dist/sistema-gestao-salao",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
@@ -34,17 +30,7 @@
             "value": "text/css"
           }
         ]
-      },
-      {
-        "source": "**/*.@(jpg|jpeg|gif|png|svg|ico|woff|woff2|ttf|eot)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000"
-          }
-        ]
       }
     ]
   }
 }
-
