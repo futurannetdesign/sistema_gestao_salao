@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SupabaseService } from '../../../services/supabase.service';
 import { Produto } from '../../../models/estoque.model';
+import { Fornecedor } from '../../../models/fornecedor.model';
 
 @Component({
   selector: 'app-produto-form',
@@ -16,6 +17,7 @@ export class ProdutoFormComponent implements OnInit {
   alertMessage = '';
   alertType = '';
   unidadesMedida = ['unidade', 'litro', 'kg', 'grama', 'metro', 'caixa', 'pacote'];
+  fornecedores: Fornecedor[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -31,16 +33,25 @@ export class ProdutoFormComponent implements OnInit {
       quantidade_minima: [0, [Validators.required, Validators.min(0)]],
       unidade_medida: ['unidade'],
       valor_unitario: ['', Validators.min(0)],
-      fornecedor: [''],
+      fornecedor_id: [''],
       ativo: [true]
     });
   }
 
   async ngOnInit() {
+    await this.carregarFornecedores();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.produtoId = +id;
       await this.carregarProduto();
+    }
+  }
+
+  async carregarFornecedores() {
+    try {
+      this.fornecedores = await this.supabase.select('fornecedores', { ativo: true }) as Fornecedor[];
+    } catch (error: any) {
+      console.error('Erro ao carregar fornecedores:', error);
     }
   }
 
@@ -58,7 +69,7 @@ export class ProdutoFormComponent implements OnInit {
           quantidade_minima: produto.quantidade_minima,
           unidade_medida: produto.unidade_medida || 'unidade',
           valor_unitario: produto.valor_unitario || '',
-          fornecedor: produto.fornecedor || '',
+          fornecedor_id: produto.fornecedor_id || '',
           ativo: produto.ativo !== false
         });
       }
@@ -86,6 +97,11 @@ export class ProdutoFormComponent implements OnInit {
         dados.valor_unitario = parseFloat(dados.valor_unitario);
       } else {
         dados.valor_unitario = null;
+      }
+
+      // Remover fornecedor_id se vazio
+      if (!dados.fornecedor_id) {
+        dados.fornecedor_id = null;
       }
 
       if (this.produtoId) {

@@ -44,6 +44,7 @@
       <tr>
         <th>Nome</th>
         <th>Categoria</th>
+        <th>Fornecedor</th>
         <th>Quantidade Atual</th>
         <th>Quantidade Mínima</th>
         <th>Unidade</th>
@@ -56,6 +57,7 @@
       <tr *ngFor="let produto of produtosFiltrados" [class.baixo-estoque]="isBaixoEstoque(produto)">
         <td>{{ produto.nome }}</td>
         <td>{{ produto.categoria || '-' }}</td>
+        <td>{{ produto.fornecedor?.nome || '-' }}</td>
         <td>
           <span [ngClass]="isBaixoEstoque(produto) ? 'badge badge-danger' : ''">
             {{ produto.quantidade_atual }}

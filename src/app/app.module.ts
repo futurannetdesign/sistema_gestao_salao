@@ -17,6 +17,8 @@ import { ContaPagarFormComponent } from './modules/financeiro/contas-pagar/conta
 import { CaixaComponent } from './modules/financeiro/caixa/caixa.component';
 import { EstoqueComponent } from './modules/estoque/estoque.component';
 import { ProdutoFormComponent } from './modules/estoque/produto-form/produto-form.component';
+import { FornecedoresComponent } from './modules/fornecedores/fornecedores.component';
+import { FornecedorFormComponent } from './modules/fornecedores/fornecedor-form/fornecedor-form.component';
 import { ProfissionaisComponent } from './modules/profissionais/profissionais.component';
 import { ProfissionalFormComponent } from './modules/profissionais/profissional-form/profissional-form.component';
 import { ConfiguracoesComponent } from './modules/administracao/configuracoes/configuracoes.component';
@@ -47,9 +49,12 @@ const routes: Routes = [
       { path: 'financeiro/contas-pagar/novo', component: ContaPagarFormComponent },
       { path: 'financeiro/contas-pagar/editar/:id', component: ContaPagarFormComponent },
       { path: 'financeiro/caixa', component: CaixaComponent },
-  { path: 'estoque', component: EstoqueComponent },
-  { path: 'estoque/novo', component: ProdutoFormComponent },
-  { path: 'estoque/editar/:id', component: ProdutoFormComponent },
+      { path: 'estoque', component: EstoqueComponent },
+      { path: 'estoque/novo', component: ProdutoFormComponent },
+      { path: 'estoque/editar/:id', component: ProdutoFormComponent },
+      { path: 'fornecedores', component: FornecedoresComponent },
+      { path: 'fornecedores/novo', component: FornecedorFormComponent },
+      { path: 'fornecedores/editar/:id', component: FornecedorFormComponent },
   { path: 'configuracoes', component: ConfiguracoesComponent },
   { path: 'auditoria', component: AuditoriaComponent }
 ];
@@ -71,6 +76,8 @@ const routes: Routes = [
     CaixaComponent,
     EstoqueComponent,
     ProdutoFormComponent,
+    FornecedoresComponent,
+    FornecedorFormComponent,
     ProfissionaisComponent,
     ProfissionalFormComponent,
     ConfiguracoesComponent,

@@ -1,0 +1,86 @@
+<div class="page-header">
+  <h1>{{ fornecedorId ? 'Editar' : 'Novo' }} Fornecedor</h1>
+  <button class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <form [formGroup]="fornecedorForm" (ngSubmit)="salvar()">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nome *</label>
+        <input type="text" formControlName="nome" class="form-control" />
+        <span *ngIf="fornecedorForm.get('nome')?.invalid && fornecedorForm.get('nome')?.touched" class="error-message">
+          Nome é obrigatório
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select formControlName="ativo" class="form-control">
+          <option [value]="true">Ativo</option>
+          <option [value]="false">Inativo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Telefone</label>
+        <input type="text" formControlName="telefone" class="form-control" placeholder="(XX) XXXXX-XXXX" />
+      </div>
+      <div class="form-group">
+        <label>WhatsApp</label>
+        <input type="text" formControlName="whatsapp" class="form-control" placeholder="(XX) XXXXX-XXXX" />
+        <small class="form-help">Número para contato via WhatsApp</small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" formControlName="email" class="form-control" />
+        <span *ngIf="fornecedorForm.get('email')?.invalid && fornecedorForm.get('email')?.touched" class="error-message">
+          E-mail inválido
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Endereço</label>
+      <input type="text" formControlName="endereco" class="form-control" placeholder="Rua, número, complemento" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cidade</label>
+        <input type="text" formControlName="cidade" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <input type="text" formControlName="estado" class="form-control" placeholder="UF" maxlength="2" />
+      </div>
+      <div class="form-group">
+        <label>CEP</label>
+        <input type="text" formControlName="cep" class="form-control" placeholder="XXXXX-XXX" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Observações</label>
+      <textarea formControlName="observacoes" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="loading">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || fornecedorForm.invalid">
+        {{ loading ? 'Salvando...' : (fornecedorId ? 'Atualizar' : 'Salvar') }}
+      </button>
+    </div>
+  </form>
+</div>
+

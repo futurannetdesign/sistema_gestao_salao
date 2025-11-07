@@ -1,16 +1,28 @@
 <div class="page-header">
-  <h1>💵 Caixa</h1>
+  <h1>💵 Caixa - Dashboard Financeiro</h1>
+  <div class="header-actions">
+    <button class="btn btn-primary btn-small" (click)="sincronizarManual()" [disabled]="loading">
+      🔄 Sincronizar
+    </button>
+    <button class="btn btn-primary btn-small" (click)="novaContaReceber()">
+      ➕ Receber
+    </button>
+    <button class="btn btn-secondary btn-small" (click)="novaContaPagar()">
+      ➕ Pagar
+    </button>
+  </div>
 </div>
 
 <div *ngIf="alertMessage" class="alert alert-{{alertType}}">
   {{ alertMessage }}
 </div>
 
+<!-- Resumo Geral do Caixa -->
 <div class="resumo-cards">
-  <div class="resumo-card">
+  <div class="resumo-card card-saldo">
     <h3>Saldo Atual</h3>
-    <p class="valor" [ngClass]="saldoAtual >= 0 ? 'valor-positivo' : 'valor-negativo'">
-      {{ formatarMoeda(saldoAtual) }}
+    <p class="valor">
+      {{ formatarMoeda(saldoAtual !== undefined && saldoAtual !== null ? saldoAtual : 0) }}
     </p>
   </div>
   <div class="resumo-card">
@@ -29,7 +41,59 @@
   </div>
 </div>
 
+<!-- Resumo Contas a Receber -->
 <div class="card">
+  <div class="card-header">
+    <h2>📥 Contas a Receber</h2>
+    <button class="btn btn-primary btn-small" (click)="verContasReceber()">
+      Ver Todas
+    </button>
+  </div>
+  <div class="resumo-cards">
+    <div class="resumo-card">
+      <h3>Pendente</h3>
+      <p class="valor valor-pendente">{{ formatarMoeda(totalReceberPendente) }}</p>
+    </div>
+    <div class="resumo-card">
+      <h3>Pago</h3>
+      <p class="valor valor-pago">{{ formatarMoeda(totalReceberPago) }}</p>
+    </div>
+    <div class="resumo-card">
+      <h3>Vencido</h3>
+      <p class="valor valor-vencido">{{ formatarMoeda(totalReceberVencido) }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Resumo Contas a Pagar -->
+<div class="card">
+  <div class="card-header">
+    <h2>📤 Contas a Pagar</h2>
+    <button class="btn btn-primary btn-small" (click)="verContasPagar()">
+      Ver Todas
+    </button>
+  </div>
+  <div class="resumo-cards">
+    <div class="resumo-card">
+      <h3>Pendente</h3>
+      <p class="valor valor-pendente">{{ formatarMoeda(totalPagarPendente) }}</p>
+    </div>
+    <div class="resumo-card">
+      <h3>Pago</h3>
+      <p class="valor valor-pago">{{ formatarMoeda(totalPagarPago) }}</p>
+    </div>
+    <div class="resumo-card">
+      <h3>Vencido</h3>
+      <p class="valor valor-vencido">{{ formatarMoeda(totalPagarVencido) }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Movimentações do Caixa -->
+<div class="card">
+  <div class="card-header">
+    <h2>💵 Movimentações do Caixa</h2>
+  </div>
   <div class="filters-bar">
     <input
       type="date"

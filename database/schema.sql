@@ -101,7 +101,24 @@ create table movimentacoes_caixa (
   created_at timestamp default now()
 );
 
--- 8. Tabela de Produtos (Estoque)
+-- 8. Tabela de Fornecedores
+create table fornecedores (
+  id bigint generated always as identity primary key,
+  nome text not null,
+  telefone text,
+  whatsapp text,
+  email text,
+  endereco text,
+  cidade text,
+  estado text,
+  cep text,
+  observacoes text,
+  ativo boolean default true,
+  created_at timestamp default now(),
+  updated_at timestamp default now()
+);
+
+-- 9. Tabela de Produtos (Estoque)
 create table produtos (
   id bigint generated always as identity primary key,
   nome text not null,
@@ -111,13 +128,13 @@ create table produtos (
   quantidade_minima integer not null default 0,
   unidade_medida text default 'unidade', -- unidade, litro, kg, etc
   valor_unitario numeric(10,2),
-  fornecedor text,
+  fornecedor_id bigint references fornecedores(id) on delete set null,
   ativo boolean default true,
   created_at timestamp default now(),
   updated_at timestamp default now()
 );
 
--- 9. Tabela de Movimentações de Estoque
+-- 10. Tabela de Movimentações de Estoque
 create table movimentacoes_estoque (
   id bigint generated always as identity primary key,
   produto_id bigint not null references produtos(id) on delete restrict,
@@ -128,7 +145,7 @@ create table movimentacoes_estoque (
   created_at timestamp default now()
 );
 
--- 10. Tabela de Usuários do Sistema
+-- 11. Tabela de Usuários do Sistema
 create table usuarios (
   id bigint generated always as identity primary key,
   nome text not null,
@@ -140,7 +157,7 @@ create table usuarios (
   updated_at timestamp default now()
 );
 
--- 11. Tabela de Configurações do Sistema
+-- 12. Tabela de Configurações do Sistema
 create table configuracoes (
   id bigint generated always as identity primary key,
   chave text not null unique,

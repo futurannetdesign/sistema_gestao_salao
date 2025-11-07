@@ -1,0 +1,107 @@
+<div class="page-header">
+  <h1>🏢 Fornecedores</h1>
+  <div class="header-actions">
+    <button class="btn btn-primary btn-small" (click)="novoFornecedor()">
+      ➕ Adicionar
+    </button>
+  </div>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <div class="filters-bar">
+    <input
+      type="text"
+      placeholder="Buscar por nome, telefone, WhatsApp, email ou cidade..."
+      [(ngModel)]="searchTerm"
+      (input)="filtrarFornecedores()"
+      class="search-input"
+    />
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando fornecedores...
+  </div>
+
+  <div *ngIf="!loading && fornecedoresFiltrados.length === 0" class="empty-state">
+    <p>Nenhum fornecedor encontrado.</p>
+  </div>
+
+  <table *ngIf="!loading && fornecedoresFiltrados.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Telefone</th>
+        <th>WhatsApp</th>
+        <th>Email</th>
+        <th>Endereço</th>
+        <th>Cidade/Estado</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let fornecedor of fornecedoresFiltrados">
+        <td>{{ fornecedor.nome }}</td>
+        <td>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <span>{{ formatarTelefone(fornecedor.telefone) }}</span>
+            <button 
+              *ngIf="fornecedor.telefone" 
+              class="btn btn-primary btn-small" 
+              (click)="ligar(fornecedor.telefone)"
+              title="Ligar"
+              style="font-size: 11px; padding: 4px 8px;"
+            >
+              📞
+            </button>
+          </div>
+        </td>
+        <td>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <span>{{ formatarTelefone(fornecedor.whatsapp) }}</span>
+            <button 
+              *ngIf="fornecedor.whatsapp" 
+              class="btn btn-success btn-small" 
+              (click)="abrirWhatsApp(fornecedor.whatsapp)"
+              title="Abrir WhatsApp"
+              style="font-size: 11px; padding: 4px 8px;"
+            >
+              💬 WhatsApp
+            </button>
+          </div>
+        </td>
+        <td>{{ fornecedor.email || '-' }}</td>
+        <td>{{ fornecedor.endereco || '-' }}</td>
+        <td>{{ fornecedor.cidade || '-' }}{{ fornecedor.estado ? ', ' + fornecedor.estado : '' }}</td>
+        <td>
+          <span class="badge" [ngClass]="(fornecedor.ativo ?? true) ? 'badge-success' : 'badge-danger'">
+            {{ (fornecedor.ativo ?? true) ? 'Ativo' : 'Inativo' }}
+          </span>
+        </td>
+        <td>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <button 
+              class="btn btn-edit btn-small" 
+              (click)="editarFornecedor(fornecedor.id!)"
+              title="Editar fornecedor"
+            >
+              ✏️ Editar
+            </button>
+            <button 
+              class="btn btn-danger btn-small" 
+              (click)="excluirFornecedor(fornecedor.id!)"
+              title="Desativar fornecedor"
+            >
+              ✕
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

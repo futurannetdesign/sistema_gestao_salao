@@ -31,8 +31,19 @@ export class EstoqueComponent implements OnInit {
     try {
       this.loading = true;
       this.produtos = await this.supabase.select('produtos') as Produto[];
+      
+      // Carregar dados dos fornecedores
+      for (const produto of this.produtos) {
+        if (produto.fornecedor_id) {
+          const fornecedores = await this.supabase.select('fornecedores', { id: produto.fornecedor_id });
+          if (fornecedores && fornecedores.length > 0) {
+            produto.fornecedor = fornecedores[0] as any;
+          }
+        }
+      }
+      
       this.produtosBaixoEstoque = this.produtos.filter(p => 
-        p.ativo && p.quantidade_atual <= p.quantidade_minima
+        (p.ativo ?? false) && p.quantidade_atual <= p.quantidade_minima
       );
       this.filtrarProdutos();
       this.loading = false;

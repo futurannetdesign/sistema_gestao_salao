@@ -58,9 +58,15 @@
             <span>💵</span> Caixa
           </a>
         </div>
-        <a routerLink="/estoque" routerLinkActive="active" (click)="menuOpen = false">
-          <span>📦</span> Estoque
-        </a>
+        <div class="nav-section">
+          <span class="nav-section-title">📦 Estoque</span>
+          <a routerLink="/estoque" routerLinkActive="active" (click)="menuOpen = false">
+            <span>📦</span> Produtos
+          </a>
+          <a routerLink="/fornecedores" routerLinkActive="active" (click)="menuOpen = false">
+            <span>🏢</span> Fornecedores
+          </a>
+        </div>
         <a routerLink="/configuracoes" routerLinkActive="active" (click)="menuOpen = false">
           <span>⚙️</span> Configurações
         </a>
