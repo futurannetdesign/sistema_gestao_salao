@@ -16,15 +16,23 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Verificar autenticação ao navegar
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      const url = event.url;
-      if (url !== '/login' && !this.authService.isAuthenticated()) {
-        this.router.navigate(['/login'], { queryParams: { returnUrl: url } });
-      }
-    });
+    // Aguardar um pouco antes de verificar autenticação para garantir que tudo está carregado
+    setTimeout(() => {
+      // Verificar autenticação ao navegar
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+      ).subscribe((event: any) => {
+        try {
+          const url = event.url;
+          // Não redirecionar se já estiver na página de login
+          if (url !== '/login' && url !== '/' && !this.authService.isAuthenticated()) {
+            this.router.navigate(['/login'], { queryParams: { returnUrl: url } });
+          }
+        } catch (error) {
+          console.error('Erro ao verificar autenticação:', error);
+        }
+      });
+    }, 100);
   }
 }
 

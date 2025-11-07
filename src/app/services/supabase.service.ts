@@ -9,7 +9,16 @@ export class SupabaseService {
   private supabase: SupabaseClient;
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    try {
+      if (!environment.supabaseUrl || !environment.supabaseKey) {
+        console.error('Variáveis de ambiente do Supabase não configuradas!');
+        throw new Error('Configuração do Supabase ausente');
+      }
+      this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    } catch (error) {
+      console.error('Erro ao inicializar Supabase:', error);
+      throw error;
+    }
   }
 
   get client(): SupabaseClient {
