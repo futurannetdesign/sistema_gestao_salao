@@ -99,6 +99,7 @@
 .header-nav {
   display: flex;
   gap: 15px;
+  align-items: center;
 }
 
 .header-nav a {
@@ -111,6 +112,34 @@
 
 .header-nav a:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  margin-right: 10px;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--white);
+}
+
+.user-profile {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-profile.admin {
+  background-color: rgba(255, 215, 0, 0.3);
+  color: #FFD700;
+  font-weight: 600;
 }
 
 @media (max-width: 1024px) {

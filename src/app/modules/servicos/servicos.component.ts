@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
+import { PermissaoService } from '../../services/permissao.service';
 import { Servico, CATEGORIAS_SERVICOS } from '../../models/servico.model';
 
 @Component({
@@ -17,14 +18,25 @@ export class ServicosComponent implements OnInit {
   alertMessage = '';
   alertType = '';
   categorias = CATEGORIAS_SERVICOS;
+  podeCriar = false;
+  podeEditar = false;
+  podeExcluir = false;
 
   constructor(
     private supabase: SupabaseService,
-    private router: Router
+    private router: Router,
+    public permissaoService: PermissaoService
   ) {}
 
   async ngOnInit() {
+    await this.carregarPermissoes();
     await this.carregarServicos();
+  }
+
+  async carregarPermissoes() {
+    this.podeCriar = await this.permissaoService.podeCriar('servicos');
+    this.podeEditar = await this.permissaoService.podeEditar('servicos');
+    this.podeExcluir = await this.permissaoService.podeExcluir('servicos');
   }
 
   async carregarServicos() {

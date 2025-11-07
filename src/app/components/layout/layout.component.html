@@ -23,7 +23,15 @@
       </div>
       
       <nav class="header-nav">
-        <a routerLink="/dashboard">Dashboard</a>
+        <div class="user-info" *ngIf="usuarioLogado">
+          <span class="user-name">{{ usuarioLogado.nome }}</span>
+          <span class="user-profile" [class.admin]="usuarioLogado.perfil === 'admin'">
+            {{ usuarioLogado.perfil === 'admin' ? '👑 Admin' : '👤 Funcionário' }}
+          </span>
+        </div>
+        <button class="btn btn-danger btn-small" (click)="logout()" title="Sair">
+          🚪 Sair
+        </button>
       </nav>
     </div>
   </header>
@@ -34,45 +42,54 @@
         <a routerLink="/dashboard" routerLinkActive="active" (click)="menuOpen = false">
           <span>📊</span> Dashboard
         </a>
-        <a routerLink="/clientes" routerLinkActive="active" (click)="menuOpen = false">
+        <a *ngIf="podeVerClientes" routerLink="/clientes" routerLinkActive="active" (click)="menuOpen = false">
           <span>👥</span> Clientes
         </a>
-        <a routerLink="/servicos" routerLinkActive="active" (click)="menuOpen = false">
+        <a *ngIf="podeVerServicos" routerLink="/servicos" routerLinkActive="active" (click)="menuOpen = false">
           <span>✂️</span> Serviços
         </a>
-        <a routerLink="/profissionais" routerLinkActive="active" (click)="menuOpen = false">
+        <a *ngIf="podeVerProfissionais" routerLink="/profissionais" routerLinkActive="active" (click)="menuOpen = false">
           <span>👨‍💼</span> Profissionais
         </a>
-        <a routerLink="/agendamentos" routerLinkActive="active" (click)="menuOpen = false">
+        <a *ngIf="podeVerAgendamentos" routerLink="/agendamentos" routerLinkActive="active" (click)="menuOpen = false">
           <span>📅</span> Agendamentos
         </a>
-        <div class="nav-section">
+        <div class="nav-section" *ngIf="podeVerContasReceber || podeVerContasPagar || podeVerCaixa">
           <span class="nav-section-title">💰 Financeiro</span>
-          <a routerLink="/financeiro/contas-receber" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerContasReceber" routerLink="/financeiro/contas-receber" routerLinkActive="active" (click)="menuOpen = false">
             <span>📥</span> Contas a Receber
           </a>
-          <a routerLink="/financeiro/contas-pagar" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerContasPagar" routerLink="/financeiro/contas-pagar" routerLinkActive="active" (click)="menuOpen = false">
             <span>📤</span> Contas a Pagar
           </a>
-          <a routerLink="/financeiro/caixa" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerCaixa" routerLink="/financeiro/caixa" routerLinkActive="active" (click)="menuOpen = false">
             <span>💵</span> Caixa
           </a>
         </div>
-        <div class="nav-section">
+        <div class="nav-section" *ngIf="podeVerEstoque || podeVerFornecedores">
           <span class="nav-section-title">📦 Estoque</span>
-          <a routerLink="/estoque" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerEstoque" routerLink="/estoque" routerLinkActive="active" (click)="menuOpen = false">
             <span>📦</span> Produtos
           </a>
-          <a routerLink="/fornecedores" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerFornecedores" routerLink="/fornecedores" routerLinkActive="active" (click)="menuOpen = false">
             <span>🏢</span> Fornecedores
           </a>
         </div>
-        <a routerLink="/configuracoes" routerLinkActive="active" (click)="menuOpen = false">
-          <span>⚙️</span> Configurações
-        </a>
-        <a routerLink="/auditoria" routerLinkActive="active" (click)="menuOpen = false">
-          <span>🔍</span> Auditoria
-        </a>
+        <div class="nav-section" *ngIf="authService.isAdmin()">
+          <span class="nav-section-title">⚙️ Administração</span>
+          <a routerLink="/configuracoes" routerLinkActive="active" (click)="menuOpen = false">
+            <span>⚙️</span> Configurações
+          </a>
+          <a routerLink="/permissoes" routerLinkActive="active" (click)="menuOpen = false">
+            <span>🔐</span> Permissões
+          </a>
+          <a routerLink="/migrar-senhas" routerLinkActive="active" (click)="menuOpen = false">
+            <span>🔒</span> Migrar Senhas
+          </a>
+          <a routerLink="/auditoria" routerLinkActive="active" (click)="menuOpen = false">
+            <span>🔍</span> Auditoria
+          </a>
+        </div>
       </nav>
     </aside>
 

@@ -1,15 +1,23 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuditoriaService {
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private authService: AuthService
+  ) {}
 
   async registrar(acao: string, tabela: string, registroId?: number, dadosAnteriores?: any, dadosNovos?: any, observacoes?: string) {
     try {
+      // Obter usuário logado para auditoria
+      const usuario = this.authService.getUsuarioLogado();
+      
       const auditoria = {
+        usuario_id: usuario?.id || null, // Sempre registrar qual usuário fez a ação
         acao,
         tabela,
         registro_id: registroId || null,

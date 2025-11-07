@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
+import { PermissaoService } from '../../../services/permissao.service';
 import { ContaReceber } from '../../../models/financeiro.model';
 import { Cliente } from '../../../models/cliente.model';
 import { Agendamento } from '../../../models/agendamento.model';
@@ -24,13 +25,20 @@ export class ContasReceberComponent implements OnInit {
   totalPendente = 0;
   totalPago = 0;
   totalVencido = 0;
+  podeCriar = false;
+  podeEditar = false;
+  podeExcluir = false;
+  podeMarcarPago = false;
+  podeSincronizar = false;
 
   constructor(
     private supabase: SupabaseService,
-    private router: Router
+    private router: Router,
+    public permissaoService: PermissaoService
   ) {}
 
   async ngOnInit() {
+    await this.carregarPermissoes();
     await Promise.all([
       this.carregarContas(),
       this.carregarClientes()
@@ -38,6 +46,14 @@ export class ContasReceberComponent implements OnInit {
     
     // Sincronizar agendamentos existentes automaticamente ao carregar
     await this.sincronizarAgendamentos();
+  }
+
+  async carregarPermissoes() {
+    this.podeCriar = await this.permissaoService.podeCriar('contas_receber');
+    this.podeEditar = await this.permissaoService.podeEditar('contas_receber');
+    this.podeExcluir = await this.permissaoService.podeExcluir('contas_receber');
+    this.podeMarcarPago = await this.permissaoService.verificarPermissao('contas_receber', 'marcar_pago');
+    this.podeSincronizar = await this.permissaoService.verificarPermissao('contas_receber', 'sincronizar');
   }
 
   async carregarContas() {

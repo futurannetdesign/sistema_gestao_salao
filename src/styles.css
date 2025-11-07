@@ -83,6 +83,11 @@ body {
   color: var(--white);
 }
 
+.btn-info {
+  background-color: var(--info-color);
+  color: var(--white);
+}
+
 .form-group {
   margin-bottom: 20px;
 }

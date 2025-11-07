@@ -1,0 +1,69 @@
+<div class="page-header">
+  <h1>🔐 Gerenciar Permissões</h1>
+  <div class="header-actions">
+    <select [(ngModel)]="perfilSelecionado" (change)="onPerfilChange()" class="form-control" style="width: 200px;">
+      <option value="funcionario">Funcionário</option>
+      <option value="admin">Administrador</option>
+    </select>
+  </div>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div *ngIf="!authService.isAdmin()" class="alert alert-danger">
+  Apenas administradores podem gerenciar permissões!
+</div>
+
+<div *ngIf="authService.isAdmin() && !loading" class="card">
+  <div class="permissoes-info">
+    <p><strong>Perfil:</strong> {{ perfilSelecionado === 'admin' ? 'Administrador' : 'Funcionário' }}</p>
+    <p class="info-text">
+      <strong>Administrador:</strong> Tem acesso total a todas as funcionalidades do sistema.<br>
+      <strong>Funcionário:</strong> Permissões configuráveis abaixo. Marque as ações permitidas.
+    </p>
+  </div>
+
+  <div *ngIf="perfilSelecionado === 'admin'" class="alert alert-info">
+    <strong>Nota:</strong> Administradores têm acesso total. As permissões abaixo são apenas informativas.
+  </div>
+
+  <div class="permissoes-table">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Módulo</th>
+          <th>Visualizar</th>
+          <th>Criar</th>
+          <th>Editar</th>
+          <th>Excluir</th>
+          <th>Marcar Pago</th>
+          <th>Sincronizar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let modulo of modulos">
+          <td><strong>{{ modulo.label }}</strong></td>
+          <td *ngFor="let acao of acoes">
+            <label class="checkbox-label" *ngIf="acoesPorModulo[modulo.key]?.includes(acao.key)">
+              <input
+                type="checkbox"
+                [checked]="temPermissao(modulo.key, acao.key)"
+                [disabled]="perfilSelecionado === 'admin'"
+                (change)="alterarPermissao(modulo.key, acao.key, $any($event.target).checked)"
+              />
+              <span class="checkmark"></span>
+            </label>
+            <span *ngIf="!acoesPorModulo[modulo.key]?.includes(acao.key)">-</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading">
+  Carregando permissões...
+</div>
+

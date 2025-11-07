@@ -22,28 +22,42 @@ import { FornecedorFormComponent } from './modules/fornecedores/fornecedor-form/
 import { ProfissionaisComponent } from './modules/profissionais/profissionais.component';
 import { ProfissionalFormComponent } from './modules/profissionais/profissional-form/profissional-form.component';
 import { ConfiguracoesComponent } from './modules/administracao/configuracoes/configuracoes.component';
+import { PermissoesComponent } from './modules/administracao/permissoes/permissoes.component';
+import { MigrarSenhasComponent } from './modules/administracao/migrar-senhas/migrar-senhas.component';
 import { OrdemServicoComponent } from './modules/ordem-servico/ordem-servico.component';
 import { AuditoriaComponent } from './modules/auditoria/auditoria.component';
+import { LoginComponent } from './modules/login/login.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { SupabaseService } from './services/supabase.service';
 import { AuditoriaService } from './services/auditoria.service';
+import { AuthService } from './services/auth.service';
+import { PasswordService } from './services/password.service';
+import { PermissaoService } from './services/permissao.service';
+import { AuthGuard } from './guards/auth.guard';
+import { PermissaoGuard } from './guards/permissao.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'clientes', component: ClientesComponent },
-  { path: 'clientes/novo', component: ClienteFormComponent },
-  { path: 'clientes/editar/:id', component: ClienteFormComponent },
-  { path: 'servicos', component: ServicosComponent },
-  { path: 'servicos/novo', component: ServicoFormComponent },
-  { path: 'servicos/editar/:id', component: ServicoFormComponent },
-  { path: 'profissionais', component: ProfissionaisComponent },
-  { path: 'profissionais/novo', component: ProfissionalFormComponent },
-  { path: 'profissionais/editar/:id', component: ProfissionalFormComponent },
-  { path: 'agendamentos', component: AgendamentosComponent },
-  { path: 'agendamentos/novo', component: AgendamentoFormComponent },
-  { path: 'agendamentos/editar/:id', component: AgendamentoFormComponent },
-  { path: 'agendamentos/ordem-servico/:id', component: OrdemServicoComponent },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { 
+    path: '', 
+    component: LayoutComponent,
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'clientes', component: ClientesComponent },
+      { path: 'clientes/novo', component: ClienteFormComponent },
+      { path: 'clientes/editar/:id', component: ClienteFormComponent },
+      { path: 'servicos', component: ServicosComponent },
+      { path: 'servicos/novo', component: ServicoFormComponent },
+      { path: 'servicos/editar/:id', component: ServicoFormComponent },
+      { path: 'profissionais', component: ProfissionaisComponent },
+      { path: 'profissionais/novo', component: ProfissionalFormComponent },
+      { path: 'profissionais/editar/:id', component: ProfissionalFormComponent },
+      { path: 'agendamentos', component: AgendamentosComponent },
+      { path: 'agendamentos/novo', component: AgendamentoFormComponent },
+      { path: 'agendamentos/editar/:id', component: AgendamentoFormComponent },
+      { path: 'agendamentos/ordem-servico/:id', component: OrdemServicoComponent },
       { path: 'financeiro/contas-receber', component: ContasReceberComponent },
       { path: 'financeiro/contas-pagar', component: ContasPagarComponent },
       { path: 'financeiro/contas-pagar/novo', component: ContaPagarFormComponent },
@@ -55,8 +69,12 @@ const routes: Routes = [
       { path: 'fornecedores', component: FornecedoresComponent },
       { path: 'fornecedores/novo', component: FornecedorFormComponent },
       { path: 'fornecedores/editar/:id', component: FornecedorFormComponent },
-  { path: 'configuracoes', component: ConfiguracoesComponent },
-  { path: 'auditoria', component: AuditoriaComponent }
+      { path: 'configuracoes', component: ConfiguracoesComponent },
+      { path: 'permissoes', component: PermissoesComponent },
+      { path: 'migrar-senhas', component: MigrarSenhasComponent },
+      { path: 'auditoria', component: AuditoriaComponent }
+    ]
+  }
 ];
 
 @NgModule({
@@ -81,8 +99,11 @@ const routes: Routes = [
     ProfissionaisComponent,
     ProfissionalFormComponent,
     ConfiguracoesComponent,
+    PermissoesComponent,
+    MigrarSenhasComponent,
     OrdemServicoComponent,
-    AuditoriaComponent
+    AuditoriaComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -90,7 +111,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forRoot(routes)
   ],
-  providers: [SupabaseService, AuditoriaService],
+  providers: [SupabaseService, AuditoriaService, AuthService, PasswordService, PermissaoService, AuthGuard, PermissaoGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

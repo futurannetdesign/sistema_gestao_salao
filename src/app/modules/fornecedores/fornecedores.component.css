@@ -51,6 +51,14 @@
   vertical-align: middle;
 }
 
+.table td > div {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .filters-bar {
     flex-direction: column;
@@ -68,6 +76,10 @@
   .table td {
     padding: 8px;
     font-size: 12px;
+  }
+  
+  .table td > div {
+    flex-wrap: wrap;
   }
 }
 

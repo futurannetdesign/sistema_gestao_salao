@@ -1,0 +1,77 @@
+<div class="page-header">
+  <h1>🔐 Migrar Senhas para Hash</h1>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div *ngIf="!authService.isAdmin()" class="alert alert-danger">
+  Apenas administradores podem migrar senhas!
+</div>
+
+<div *ngIf="authService.isAdmin() && !loading" class="card">
+  <div class="migracao-info">
+    <h3>Status da Migração</h3>
+    <p><strong>Total de usuários:</strong> {{ usuarios.length }}</p>
+    <p><strong>Usuários com senha em texto plano:</strong> {{ usuariosComSenhaPlana.length }}</p>
+    <p><strong>Usuários com senha hasheada:</strong> {{ usuarios.length - usuariosComSenhaPlana.length }}</p>
+  </div>
+
+  <div *ngIf="usuariosComSenhaPlana.length > 0" class="alert alert-warning">
+    <strong>⚠️ Atenção:</strong> Existem {{ usuariosComSenhaPlana.length }} usuário(s) com senha em texto plano.
+    <br><br>
+    <strong>Migração Automática:</strong> As senhas serão migradas automaticamente para hash quando cada usuário fizer login pela primeira vez após a implementação do hash.
+    <br><br>
+    <strong>Como funciona:</strong>
+    <ul style="margin: 10px 0; padding-left: 20px;">
+      <li>O sistema detecta senhas em texto plano automaticamente</li>
+      <li>No primeiro login, a senha é verificada e migrada para hash</li>
+      <li>O processo é transparente para o usuário</li>
+      <li>Não é necessário migrar manualmente</li>
+    </ul>
+  </div>
+
+  <div *ngIf="usuariosComSenhaPlana.length === 0" class="alert alert-success">
+    <strong>✅ Tudo certo!</strong> Todas as senhas estão hasheadas.
+  </div>
+
+  <div *ngIf="usuariosComSenhaPlana.length > 0" class="usuarios-lista">
+    <h3>Usuários com Senha em Texto Plano</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Perfil</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuariosComSenhaPlana">
+          <td>{{ usuario.id }}</td>
+          <td>{{ usuario.nome }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="usuario.perfil === 'admin'">
+              {{ usuario.perfil === 'admin' ? 'Admin' : 'Funcionário' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-warning">Senha em Texto Plano</span>
+          </td>
+          <td>
+            <span class="badge badge-info">Migração Automática</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading">
+  Carregando usuários...
+</div>
+

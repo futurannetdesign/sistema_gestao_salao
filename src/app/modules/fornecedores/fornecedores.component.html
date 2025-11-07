@@ -47,28 +47,26 @@
       <tr *ngFor="let fornecedor of fornecedoresFiltrados">
         <td>{{ fornecedor.nome }}</td>
         <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: nowrap;">
             <span>{{ formatarTelefone(fornecedor.telefone) }}</span>
             <button 
               *ngIf="fornecedor.telefone" 
               class="btn btn-primary btn-small" 
               (click)="ligar(fornecedor.telefone)"
               title="Ligar"
-              style="font-size: 11px; padding: 4px 8px;"
             >
               📞
             </button>
           </div>
         </td>
         <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: nowrap;">
             <span>{{ formatarTelefone(fornecedor.whatsapp) }}</span>
             <button 
               *ngIf="fornecedor.whatsapp" 
               class="btn btn-success btn-small" 
               (click)="abrirWhatsApp(fornecedor.whatsapp)"
               title="Abrir WhatsApp"
-              style="font-size: 11px; padding: 4px 8px;"
             >
               💬 WhatsApp
             </button>
@@ -83,13 +81,13 @@
           </span>
         </td>
         <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: nowrap;">
             <button 
               class="btn btn-edit btn-small" 
               (click)="editarFornecedor(fornecedor.id!)"
               title="Editar fornecedor"
             >
-              ✏️ Editar
+              Editar
             </button>
             <button 
               class="btn btn-danger btn-small" 

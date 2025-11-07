@@ -1,6 +1,6 @@
 <div class="page-header">
   <h1>👥 Clientes</h1>
-  <button class="btn btn-primary" (click)="novoCliente()">+ Novo Cliente</button>
+  <button *ngIf="podeCriar" class="btn btn-primary" (click)="novoCliente()">+ Novo Cliente</button>
 </div>
 
 <div *ngIf="alertMessage" class="alert alert-{{alertType}}">
@@ -40,14 +40,48 @@
       <tr *ngFor="let cliente of clientesFiltrados">
         <td>{{ cliente.nome }}</td>
         <td>{{ formatarTelefone(cliente.celular) }}</td>
-        <td>{{ formatarTelefone(cliente.whatsapp) }}</td>
+        <td>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <span>{{ formatarTelefone(cliente.whatsapp) }}</span>
+            <div class="whatsapp-actions" *ngIf="cliente.whatsapp || cliente.celular">
+              <button 
+                class="btn btn-success btn-small" 
+                (click)="abrirWhatsApp(cliente)"
+                title="Abrir WhatsApp"
+              >
+                💬 WhatsApp
+              </button>
+              <button 
+                class="btn btn-primary btn-small" 
+                (click)="enviarPromocao(cliente)"
+                title="Enviar Promoção"
+              >
+                🎉 Promoção
+              </button>
+              <button 
+                class="btn btn-warning btn-small" 
+                (click)="enviarBoleto(cliente)"
+                title="Enviar Boleto/Conta a Receber"
+              >
+                💰 Boleto
+              </button>
+              <button 
+                class="btn btn-info btn-small" 
+                (click)="enviarOrdemServico(cliente)"
+                title="Enviar Ordem de Serviço"
+              >
+                📄 OS
+              </button>
+            </div>
+          </div>
+        </td>
         <td>{{ cliente.sexo || '-' }}</td>
         <td>
           <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-edit btn-small" (click)="editarCliente(cliente.id!)">
+            <button *ngIf="podeEditar" class="btn btn-edit btn-small" (click)="editarCliente(cliente.id!)">
               Editar
             </button>
-            <button class="btn btn-danger btn-small" (click)="excluirCliente(cliente.id!)">
+            <button *ngIf="podeExcluir" class="btn btn-danger btn-small" (click)="excluirCliente(cliente.id!)">
               ✕
             </button>
           </div>

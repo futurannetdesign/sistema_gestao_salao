@@ -1,0 +1,55 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>🔐 Login</h1>
+      <p>Sistema de Gestão para Salão de Beleza</p>
+    </div>
+
+    <div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+      {{ alertMessage }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>E-mail</label>
+        <input 
+          type="email" 
+          formControlName="email" 
+          class="form-control" 
+          placeholder="seu@email.com"
+          [class.ng-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
+        <span *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
+          E-mail inválido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Senha</label>
+        <input 
+          type="password" 
+          formControlName="senha" 
+          class="form-control" 
+          placeholder="Digite sua senha"
+          [class.ng-invalid]="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched"
+        />
+        <span *ngIf="loginForm.get('senha')?.invalid && loginForm.get('senha')?.touched" class="error-message">
+          Senha deve ter no mínimo 4 caracteres
+        </span>
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn btn-primary btn-block"
+        [disabled]="loading || loginForm.invalid"
+      >
+        {{ loading ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>© 2024 Sistema de Gestão - Salão de Beleza</p>
+    </div>
+  </div>
+</div>
+
