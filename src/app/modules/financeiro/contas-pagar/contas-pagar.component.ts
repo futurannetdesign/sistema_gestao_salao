@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
 import { ContaPagar } from '../../../models/financeiro.model';
 
@@ -14,7 +15,7 @@ export class ContasPagarComponent implements OnInit {
   searchTerm = '';
   statusFiltro = '';
   categoriaFiltro = '';
-  periodoFiltro = 'mes';
+  periodoFiltro = 'todos';
   alertMessage = '';
   alertType = '';
   totalPendente = 0;
@@ -22,7 +23,10 @@ export class ContasPagarComponent implements OnInit {
   totalVencido = 0;
   categorias = ['Aluguel', 'Água', 'Luz', 'Produtos', 'Salários', 'Outros'];
 
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     await this.carregarContas();
@@ -85,25 +89,27 @@ export class ContasPagarComponent implements OnInit {
       filtradas = filtradas.filter(conta => conta.categoria === this.categoriaFiltro);
     }
 
-    // Filtrar por período
-    const hoje = new Date();
-    if (this.periodoFiltro === 'dia') {
-      const hojeStr = hoje.toISOString().split('T')[0];
-      filtradas = filtradas.filter(conta => conta.data_vencimento === hojeStr);
-    } else if (this.periodoFiltro === 'semana') {
-      const semanaAtras = new Date(hoje);
-      semanaAtras.setDate(hoje.getDate() - 7);
-      filtradas = filtradas.filter(conta => {
-        const dataVenc = new Date(conta.data_vencimento);
-        return dataVenc >= semanaAtras && dataVenc <= hoje;
-      });
-    } else if (this.periodoFiltro === 'mes') {
-      const mesAtras = new Date(hoje);
-      mesAtras.setMonth(hoje.getMonth() - 1);
-      filtradas = filtradas.filter(conta => {
-        const dataVenc = new Date(conta.data_vencimento);
-        return dataVenc >= mesAtras && dataVenc <= hoje;
-      });
+    // Filtrar por período (só se não for "todos")
+    if (this.periodoFiltro !== 'todos') {
+      const hoje = new Date();
+      if (this.periodoFiltro === 'dia') {
+        const hojeStr = hoje.toISOString().split('T')[0];
+        filtradas = filtradas.filter(conta => conta.data_vencimento === hojeStr);
+      } else if (this.periodoFiltro === 'semana') {
+        const semanaAtras = new Date(hoje);
+        semanaAtras.setDate(hoje.getDate() - 7);
+        filtradas = filtradas.filter(conta => {
+          const dataVenc = new Date(conta.data_vencimento);
+          return dataVenc >= semanaAtras && dataVenc <= hoje;
+        });
+      } else if (this.periodoFiltro === 'mes') {
+        const mesAtras = new Date(hoje);
+        mesAtras.setMonth(hoje.getMonth() - 1);
+        filtradas = filtradas.filter(conta => {
+          const dataVenc = new Date(conta.data_vencimento);
+          return dataVenc >= mesAtras && dataVenc <= hoje;
+        });
+      }
     }
 
     this.contasFiltradas = filtradas.sort((a, b) => 
@@ -113,15 +119,65 @@ export class ContasPagarComponent implements OnInit {
 
   async marcarComoPago(id: number) {
     try {
+      const conta = this.contas.find(c => c.id === id);
+      if (!conta) {
+        this.showAlert('Conta não encontrada!', 'danger');
+        return;
+      }
+
       const hoje = new Date().toISOString().split('T')[0];
+      
+      // Atualizar conta a pagar
       await this.supabase.update('contas_pagar', id, { 
         status: 'pago',
         data_pagamento: hoje
       });
-      this.showAlert('Conta marcada como paga!', 'success');
+
+      // Criar movimentação de saída no caixa
+      await this.criarMovimentacaoCaixa(conta, hoje, 'saida');
+
+      this.showAlert('Conta marcada como paga e movimentação registrada no caixa!', 'success');
       await this.carregarContas();
     } catch (error: any) {
       this.showAlert('Erro ao atualizar conta: ' + error.message, 'danger');
+    }
+  }
+
+  async criarMovimentacaoCaixa(conta: ContaPagar, dataPagamento: string, tipo: 'entrada' | 'saida') {
+    try {
+      // Verificar se já existe movimentação para esta conta
+      const movimentacoesExistentes = await this.supabase.select('movimentacoes_caixa', { 
+        referencia_id: conta.id,
+        referencia_tipo: 'conta_pagar'
+      });
+
+      if (movimentacoesExistentes && movimentacoesExistentes.length > 0) {
+        // Atualizar movimentação existente
+        await this.supabase.update('movimentacoes_caixa', movimentacoesExistentes[0].id, {
+          valor: conta.valor,
+          data_movimentacao: dataPagamento,
+          forma_pagamento: conta.forma_pagamento || null,
+          observacoes: `Pagamento de conta a pagar: ${conta.descricao}`
+        });
+        return;
+      }
+
+      // Criar nova movimentação
+      const movimentacao = {
+        tipo: tipo,
+        descricao: `Pagamento: ${conta.descricao}`,
+        valor: conta.valor,
+        data_movimentacao: dataPagamento,
+        forma_pagamento: conta.forma_pagamento || null,
+        referencia_id: conta.id,
+        referencia_tipo: 'conta_pagar',
+        observacoes: `Pagamento de conta a pagar #${conta.id} - ${conta.categoria}`
+      };
+
+      await this.supabase.insert('movimentacoes_caixa', movimentacao);
+    } catch (error: any) {
+      console.error('Erro ao criar movimentação no caixa:', error);
+      // Não interromper o fluxo se falhar a criação da movimentação
     }
   }
 
@@ -171,6 +227,14 @@ export class ContasPagarComponent implements OnInit {
     }
   }
 
+  novaConta() {
+    this.router.navigate(['/financeiro/contas-pagar/novo']);
+  }
+
+  editarConta(id: number) {
+    this.router.navigate(['/financeiro/contas-pagar/editar', id]);
+  }
+
   showAlert(message: string, type: string) {
     this.alertMessage = message;
     this.alertType = type;
@@ -179,4 +243,3 @@ export class ContasPagarComponent implements OnInit {
     }, 5000);
   }
 }
-

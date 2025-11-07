@@ -50,6 +50,8 @@ create table agendamentos (
   status text not null default 'agendado', -- agendado, concluido, cancelado
   observacoes text,
   valor_cobrado numeric(10,2),
+  data_pagamento date,
+  forma_pagamento text, -- dinheiro, cartao, pix, transferencia
   created_at timestamp default now(),
   updated_at timestamp default now()
 );

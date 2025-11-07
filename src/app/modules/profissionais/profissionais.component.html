@@ -49,12 +49,14 @@
           </span>
         </td>
         <td>
-          <button class="btn btn-edit" (click)="editarProfissional(profissional.id!)" style="margin-right: 5px;">
-            Editar
-          </button>
-          <button class="btn btn-danger" (click)="excluirProfissional(profissional.id!)">
-            Excluir
-          </button>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-edit btn-small" (click)="editarProfissional(profissional.id!)">
+              Editar
+            </button>
+            <button class="btn btn-danger btn-small" (click)="excluirProfissional(profissional.id!)">
+              ✕
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

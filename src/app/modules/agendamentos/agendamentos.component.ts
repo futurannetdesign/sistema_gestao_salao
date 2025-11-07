@@ -161,6 +161,10 @@ export class AgendamentosComponent implements OnInit {
     this.router.navigate(['/agendamentos/editar', id]);
   }
 
+  verOrdemServico(id: number) {
+    this.router.navigate(['/agendamentos/ordem-servico', id]);
+  }
+
   async atualizarStatus(id: number, novoStatus: string) {
     try {
       // Normalizar o status antes de salvar
@@ -187,6 +191,11 @@ export class AgendamentosComponent implements OnInit {
       // Salvar no banco
       await this.supabase.update('agendamentos', id, { status: statusNormalizado });
       
+      // Se o status foi alterado para "concluído", garantir que existe conta a receber
+      if (statusNormalizado === 'concluido' && agendamento) {
+        await this.verificarCriarContaReceber(agendamento);
+      }
+      
       // Reaplicar filtros para atualizar a lista
       this.filtrarAgendamentos();
       
@@ -201,6 +210,49 @@ export class AgendamentosComponent implements OnInit {
   onStatusChange(agendamentoId: number | undefined, novoStatus: string) {
     if (!agendamentoId) return;
     this.atualizarStatus(agendamentoId, novoStatus);
+  }
+
+  async verificarCriarContaReceber(agendamento: Agendamento) {
+    try {
+      // Verificar se já existe conta a receber para este agendamento
+      const contasExistentes = await this.supabase.select('contas_receber', { agendamento_id: agendamento.id });
+      
+      if (contasExistentes && contasExistentes.length > 0) {
+        return; // Já existe conta a receber
+      }
+
+      // Buscar dados do serviço e cliente
+      const servico = this.servicos.find(s => s.id === agendamento.servico_id);
+      const cliente = this.clientes.find(c => c.id === agendamento.cliente_id);
+      
+      if (!agendamento.valor_cobrado) {
+        return; // Sem valor, não cria conta
+      }
+
+      // Data de vencimento: 7 dias após a data do agendamento
+      const dataAgendamento = new Date(agendamento.data_hora);
+      const dataVencimento = new Date(dataAgendamento);
+      dataVencimento.setDate(dataVencimento.getDate() + 7);
+
+      const descricao = servico?.nome 
+        ? (cliente?.nome ? `${servico.nome} - ${cliente.nome}` : servico.nome)
+        : 'Serviço';
+
+      const contaReceber = {
+        cliente_id: agendamento.cliente_id,
+        agendamento_id: agendamento.id,
+        descricao: descricao,
+        valor: agendamento.valor_cobrado,
+        data_vencimento: dataVencimento.toISOString().split('T')[0],
+        status: 'pendente',
+        observacoes: `Gerado automaticamente do agendamento #${agendamento.id}`
+      };
+
+      await this.supabase.insert('contas_receber', contaReceber);
+    } catch (error: any) {
+      console.error('Erro ao criar conta a receber:', error);
+      // Não interromper o fluxo se falhar
+    }
   }
 
   async excluirAgendamento(id: number) {

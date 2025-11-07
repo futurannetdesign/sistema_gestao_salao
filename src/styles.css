@@ -127,15 +127,17 @@ body {
 
 .table th,
 .table td {
-  padding: 12px;
+  padding: 10px 12px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
 }
 
 .table th {
   background-color: var(--primary-color);
   color: var(--white);
   font-weight: 600;
+  font-size: 13px;
 }
 
 .table tr:hover {
@@ -266,5 +268,65 @@ body {
   height: 64px;
   margin-bottom: 20px;
   opacity: 0.5;
+}
+
+/* Page Header - Padrão Global */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 24px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.page-header .btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.page-header .header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Botões pequenos para tabelas */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: auto;
+}
+
+/* Ações em tabelas */
+.table td {
+  vertical-align: middle;
+}
+
+.table .btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  margin-right: 5px;
+  white-space: nowrap;
+}
+
+.table .btn:last-child {
+  margin-right: 0;
+}
+
+/* Badge de agendamento - mais discreto */
+.agendamento-ref {
+  font-size: 11px;
+  color: #666;
+  font-style: italic;
 }
 

@@ -1,5 +1,8 @@
 <div class="page-header">
   <h1>📥 Contas a Receber</h1>
+  <button class="btn btn-primary btn-small" (click)="sincronizarAgendamentos()" [disabled]="loading">
+    🔄 Sincronizar
+  </button>
 </div>
 
 <div *ngIf="alertMessage" class="alert alert-{{alertType}}">
@@ -62,6 +65,7 @@
         <th>Pagamento</th>
         <th>Forma Pagamento</th>
         <th>Status</th>
+        <th>Agendamento</th>
         <th>Ações</th>
       </tr>
     </thead>
@@ -80,16 +84,29 @@
         </td>
         <td>
           <button 
-            *ngIf="conta.status !== 'pago'" 
-            class="btn btn-success" 
-            (click)="marcarComoPago(conta.id!)"
-            style="margin-right: 5px;"
+            *ngIf="conta.agendamento_id" 
+            class="btn btn-primary btn-small" 
+            (click)="verOrdemServico(conta.agendamento_id!)"
+            title="Ver Ordem de Serviço"
+            style="font-size: 11px; padding: 4px 8px;"
           >
-            Marcar como Pago
+            📄 OS
           </button>
-          <button class="btn btn-danger" (click)="excluirConta(conta.id!)">
-            Excluir
-          </button>
+          <span *ngIf="!conta.agendamento_id">-</span>
+        </td>
+        <td>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <button 
+              *ngIf="conta.status !== 'pago'" 
+              class="btn btn-success btn-small" 
+              (click)="marcarComoPago(conta.id!)"
+            >
+              ✓ Pago
+            </button>
+            <button class="btn btn-danger btn-small" (click)="excluirConta(conta.id!)">
+              ✕
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

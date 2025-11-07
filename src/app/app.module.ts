@@ -13,14 +13,18 @@ import { AgendamentosComponent } from './modules/agendamentos/agendamentos.compo
 import { AgendamentoFormComponent } from './modules/agendamentos/agendamento-form/agendamento-form.component';
 import { ContasReceberComponent } from './modules/financeiro/contas-receber/contas-receber.component';
 import { ContasPagarComponent } from './modules/financeiro/contas-pagar/contas-pagar.component';
+import { ContaPagarFormComponent } from './modules/financeiro/contas-pagar/conta-pagar-form/conta-pagar-form.component';
 import { CaixaComponent } from './modules/financeiro/caixa/caixa.component';
 import { EstoqueComponent } from './modules/estoque/estoque.component';
 import { ProdutoFormComponent } from './modules/estoque/produto-form/produto-form.component';
 import { ProfissionaisComponent } from './modules/profissionais/profissionais.component';
 import { ProfissionalFormComponent } from './modules/profissionais/profissional-form/profissional-form.component';
 import { ConfiguracoesComponent } from './modules/administracao/configuracoes/configuracoes.component';
+import { OrdemServicoComponent } from './modules/ordem-servico/ordem-servico.component';
+import { AuditoriaComponent } from './modules/auditoria/auditoria.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { SupabaseService } from './services/supabase.service';
+import { AuditoriaService } from './services/auditoria.service';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -37,13 +41,17 @@ const routes: Routes = [
   { path: 'agendamentos', component: AgendamentosComponent },
   { path: 'agendamentos/novo', component: AgendamentoFormComponent },
   { path: 'agendamentos/editar/:id', component: AgendamentoFormComponent },
-  { path: 'financeiro/contas-receber', component: ContasReceberComponent },
-  { path: 'financeiro/contas-pagar', component: ContasPagarComponent },
-  { path: 'financeiro/caixa', component: CaixaComponent },
+  { path: 'agendamentos/ordem-servico/:id', component: OrdemServicoComponent },
+      { path: 'financeiro/contas-receber', component: ContasReceberComponent },
+      { path: 'financeiro/contas-pagar', component: ContasPagarComponent },
+      { path: 'financeiro/contas-pagar/novo', component: ContaPagarFormComponent },
+      { path: 'financeiro/contas-pagar/editar/:id', component: ContaPagarFormComponent },
+      { path: 'financeiro/caixa', component: CaixaComponent },
   { path: 'estoque', component: EstoqueComponent },
   { path: 'estoque/novo', component: ProdutoFormComponent },
   { path: 'estoque/editar/:id', component: ProdutoFormComponent },
-  { path: 'configuracoes', component: ConfiguracoesComponent }
+  { path: 'configuracoes', component: ConfiguracoesComponent },
+  { path: 'auditoria', component: AuditoriaComponent }
 ];
 
 @NgModule({
@@ -59,12 +67,15 @@ const routes: Routes = [
     AgendamentoFormComponent,
     ContasReceberComponent,
     ContasPagarComponent,
+    ContaPagarFormComponent,
     CaixaComponent,
     EstoqueComponent,
     ProdutoFormComponent,
     ProfissionaisComponent,
     ProfissionalFormComponent,
-    ConfiguracoesComponent
+    ConfiguracoesComponent,
+    OrdemServicoComponent,
+    AuditoriaComponent
   ],
   imports: [
     BrowserModule,
@@ -72,7 +83,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     RouterModule.forRoot(routes)
   ],
-  providers: [SupabaseService],
+  providers: [SupabaseService, AuditoriaService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -74,6 +74,23 @@
       </div>
     </div>
 
+    <div class="form-row" *ngIf="agendamentoForm.get('status')?.value === 'concluido'">
+      <div class="form-group">
+        <label>Data de Pagamento</label>
+        <input type="date" formControlName="data_pagamento" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Forma de Pagamento</label>
+        <select formControlName="forma_pagamento" class="form-control">
+          <option value="">Selecione a forma de pagamento</option>
+          <option value="dinheiro">Dinheiro</option>
+          <option value="cartao">Cartão</option>
+          <option value="pix">PIX</option>
+          <option value="transferencia">Transferência</option>
+        </select>
+      </div>
+    </div>
+
     <div class="form-group">
       <label>Observações</label>
       <textarea formControlName="observacoes" class="form-control" rows="4"></textarea>

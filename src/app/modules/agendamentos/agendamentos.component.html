@@ -85,12 +85,15 @@
                 <option value="concluido">Concluído</option>
                 <option value="cancelado">Cancelado</option>
               </select>
-              <button class="btn btn-edit btn-small" (click)="editarAgendamento(agendamento.id!)">
-                Editar
-              </button>
-              <button class="btn btn-danger btn-small" (click)="excluirAgendamento(agendamento.id!)">
-                Excluir
-              </button>
+            <button class="btn btn-edit btn-small" (click)="editarAgendamento(agendamento.id!)">
+              Editar
+            </button>
+            <button class="btn btn-primary btn-small" (click)="verOrdemServico(agendamento.id!)" title="Ordem de Serviço">
+              📄 OS
+            </button>
+            <button class="btn btn-danger btn-small" (click)="excluirAgendamento(agendamento.id!)">
+              Excluir
+            </button>
             </div>
           </td>
         </tr>
@@ -111,6 +114,9 @@
         </div>
         <div class="calendario-actions">
           <button class="btn btn-edit" (click)="editarAgendamento(agendamento.id!)">Editar</button>
+          <button class="btn btn-primary" (click)="verOrdemServico(agendamento.id!)" title="Ordem de Serviço" style="margin-left: 5px;">
+            📄 OS
+          </button>
         </div>
       </div>
     </div>

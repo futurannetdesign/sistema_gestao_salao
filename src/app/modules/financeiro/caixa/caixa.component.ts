@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
 import { MovimentacaoCaixa } from '../../../models/financeiro.model';
 
@@ -20,7 +21,10 @@ export class CaixaComponent implements OnInit {
   totalSaidas = 0;
   saldoDia = 0;
 
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     const hoje = new Date().toISOString().split('T')[0];
@@ -96,6 +100,28 @@ export class CaixaComponent implements OnInit {
 
   getTipoLabel(tipo: string): string {
     return tipo === 'entrada' ? 'Entrada' : 'Saída';
+  }
+
+  verContaRelacionada(movimentacao: MovimentacaoCaixa) {
+    if (movimentacao.referencia_tipo === 'conta_receber' && movimentacao.referencia_id) {
+      this.router.navigate(['/financeiro/contas-receber']);
+    } else if (movimentacao.referencia_tipo === 'conta_pagar' && movimentacao.referencia_id) {
+      this.router.navigate(['/financeiro/contas-pagar']);
+    }
+  }
+
+  temReferencia(movimentacao: MovimentacaoCaixa): boolean {
+    return !!(movimentacao.referencia_id && 
+      (movimentacao.referencia_tipo === 'conta_receber' || movimentacao.referencia_tipo === 'conta_pagar'));
+  }
+
+  getReferenciaLabel(movimentacao: MovimentacaoCaixa): string {
+    if (movimentacao.referencia_tipo === 'conta_receber') {
+      return '📥 Conta a Receber';
+    } else if (movimentacao.referencia_tipo === 'conta_pagar') {
+      return '📤 Conta a Pagar';
+    }
+    return '';
   }
 
   showAlert(message: string, type: string) {

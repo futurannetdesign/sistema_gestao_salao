@@ -31,6 +31,12 @@ export class ServicosComponent implements OnInit {
     try {
       this.loading = true;
       this.servicos = await this.supabase.select('servicos') as Servico[];
+      // Garantir que valor_padrao está presente
+      this.servicos.forEach(servico => {
+        if (!servico.valor_padrao && servico.valor_padrao !== 0) {
+          console.warn(`Serviço ${servico.id} (${servico.nome}) não tem valor_padrao definido`);
+        }
+      });
       this.filtrarServicos();
       this.loading = false;
     } catch (error: any) {
@@ -66,20 +72,30 @@ export class ServicosComponent implements OnInit {
   }
 
   async excluirServico(id: number) {
-    if (!confirm('Tem certeza que deseja excluir este serviço?')) {
-      return;
-    }
-
     try {
+      // Verificar se há agendamentos vinculados
+      const agendamentos = await this.supabase.select('agendamentos', { servico_id: id }) as any[];
+      
+      if (agendamentos && agendamentos.length > 0) {
+        const mensagem = `Não é possível desativar este serviço pois existem ${agendamentos.length} agendamento(s) vinculado(s) a ele.\n\nPara desativar, primeiro é necessário excluir ou cancelar todos os agendamentos relacionados.`;
+        alert(mensagem);
+        return;
+      }
+
+      if (!confirm('Tem certeza que deseja desativar este serviço?')) {
+        return;
+      }
+
       await this.supabase.update('servicos', id, { ativo: false });
       this.showAlert('Serviço desativado com sucesso!', 'success');
       await this.carregarServicos();
     } catch (error: any) {
-      this.showAlert('Erro ao excluir serviço: ' + error.message, 'danger');
+      this.showAlert('Erro ao desativar serviço: ' + error.message, 'danger');
     }
   }
 
-  formatarMoeda(valor: number): string {
+  formatarMoeda(valor: number | undefined | null): string {
+    if (!valor && valor !== 0) return 'R$ 0,00';
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }
 

@@ -55,3 +55,14 @@
   border-radius: 4px;
 }
 
+/* Garantir que o header não colapse */
+.page-header {
+  margin-bottom: 20px;
+}
+
+/* Ajustar ações na tabela */
+.table td:last-child {
+  white-space: nowrap;
+  min-width: 120px;
+}
+

@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
 import { ContaReceber } from '../../../models/financeiro.model';
 import { Cliente } from '../../../models/cliente.model';
+import { Agendamento } from '../../../models/agendamento.model';
+import { Servico } from '../../../models/servico.model';
 
 @Component({
   selector: 'app-contas-receber',
@@ -15,20 +18,26 @@ export class ContasReceberComponent implements OnInit {
   loading = true;
   searchTerm = '';
   statusFiltro = '';
-  periodoFiltro = 'mes'; // dia, semana, mes
+  periodoFiltro = 'todos'; // dia, semana, mes, todos
   alertMessage = '';
   alertType = '';
   totalPendente = 0;
   totalPago = 0;
   totalVencido = 0;
 
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     await Promise.all([
       this.carregarContas(),
       this.carregarClientes()
     ]);
+    
+    // Sincronizar agendamentos existentes automaticamente ao carregar
+    await this.sincronizarAgendamentos();
   }
 
   async carregarContas() {
@@ -101,25 +110,27 @@ export class ContasReceberComponent implements OnInit {
       filtradas = filtradas.filter(conta => conta.status === this.statusFiltro);
     }
 
-    // Filtrar por período
-    const hoje = new Date();
-    if (this.periodoFiltro === 'dia') {
-      const hojeStr = hoje.toISOString().split('T')[0];
-      filtradas = filtradas.filter(conta => conta.data_vencimento === hojeStr);
-    } else if (this.periodoFiltro === 'semana') {
-      const semanaAtras = new Date(hoje);
-      semanaAtras.setDate(hoje.getDate() - 7);
-      filtradas = filtradas.filter(conta => {
-        const dataVenc = new Date(conta.data_vencimento);
-        return dataVenc >= semanaAtras && dataVenc <= hoje;
-      });
-    } else if (this.periodoFiltro === 'mes') {
-      const mesAtras = new Date(hoje);
-      mesAtras.setMonth(hoje.getMonth() - 1);
-      filtradas = filtradas.filter(conta => {
-        const dataVenc = new Date(conta.data_vencimento);
-        return dataVenc >= mesAtras && dataVenc <= hoje;
-      });
+    // Filtrar por período (só se não for "todos")
+    if (this.periodoFiltro !== 'todos') {
+      const hoje = new Date();
+      if (this.periodoFiltro === 'dia') {
+        const hojeStr = hoje.toISOString().split('T')[0];
+        filtradas = filtradas.filter(conta => conta.data_vencimento === hojeStr);
+      } else if (this.periodoFiltro === 'semana') {
+        const semanaAtras = new Date(hoje);
+        semanaAtras.setDate(hoje.getDate() - 7);
+        filtradas = filtradas.filter(conta => {
+          const dataVenc = new Date(conta.data_vencimento);
+          return dataVenc >= semanaAtras && dataVenc <= hoje;
+        });
+      } else if (this.periodoFiltro === 'mes') {
+        const mesAtras = new Date(hoje);
+        mesAtras.setMonth(hoje.getMonth() - 1);
+        filtradas = filtradas.filter(conta => {
+          const dataVenc = new Date(conta.data_vencimento);
+          return dataVenc >= mesAtras && dataVenc <= hoje;
+        });
+      }
     }
 
     this.contasFiltradas = filtradas.sort((a, b) => 
@@ -129,15 +140,65 @@ export class ContasReceberComponent implements OnInit {
 
   async marcarComoPago(id: number) {
     try {
+      const conta = this.contas.find(c => c.id === id);
+      if (!conta) {
+        this.showAlert('Conta não encontrada!', 'danger');
+        return;
+      }
+
       const hoje = new Date().toISOString().split('T')[0];
+      
+      // Atualizar conta a receber
       await this.supabase.update('contas_receber', id, { 
         status: 'pago',
         data_pagamento: hoje
       });
-      this.showAlert('Conta marcada como paga!', 'success');
+
+      // Criar movimentação de entrada no caixa
+      await this.criarMovimentacaoCaixa(conta, hoje, 'entrada');
+
+      this.showAlert('Conta marcada como paga e movimentação registrada no caixa!', 'success');
       await this.carregarContas();
     } catch (error: any) {
       this.showAlert('Erro ao atualizar conta: ' + error.message, 'danger');
+    }
+  }
+
+  async criarMovimentacaoCaixa(conta: ContaReceber, dataPagamento: string, tipo: 'entrada' | 'saida') {
+    try {
+      // Verificar se já existe movimentação para esta conta
+      const movimentacoesExistentes = await this.supabase.select('movimentacoes_caixa', { 
+        referencia_id: conta.id,
+        referencia_tipo: 'conta_receber'
+      });
+
+      if (movimentacoesExistentes && movimentacoesExistentes.length > 0) {
+        // Atualizar movimentação existente
+        await this.supabase.update('movimentacoes_caixa', movimentacoesExistentes[0].id, {
+          valor: conta.valor,
+          data_movimentacao: dataPagamento,
+          forma_pagamento: conta.forma_pagamento || null,
+          observacoes: `Pagamento de conta a receber: ${conta.descricao}`
+        });
+        return;
+      }
+
+      // Criar nova movimentação
+      const movimentacao = {
+        tipo: tipo,
+        descricao: `Recebimento: ${conta.descricao}`,
+        valor: conta.valor,
+        data_movimentacao: dataPagamento,
+        forma_pagamento: conta.forma_pagamento || null,
+        referencia_id: conta.id,
+        referencia_tipo: 'conta_receber',
+        observacoes: `Pagamento de conta a receber #${conta.id}`
+      };
+
+      await this.supabase.insert('movimentacoes_caixa', movimentacao);
+    } catch (error: any) {
+      console.error('Erro ao criar movimentação no caixa:', error);
+      // Não interromper o fluxo se falhar a criação da movimentação
     }
   }
 
@@ -185,6 +246,91 @@ export class ContasReceberComponent implements OnInit {
       default:
         return status;
     }
+  }
+
+  async sincronizarAgendamentos() {
+    try {
+      // Buscar todos os agendamentos que têm valor
+      const agendamentos = await this.supabase.select('agendamentos') as Agendamento[];
+      
+      // Buscar todas as contas a receber existentes para verificar quais agendamentos já têm conta
+      const contasExistentes = await this.supabase.select('contas_receber') as ContaReceber[];
+      const agendamentosComConta = new Set(contasExistentes
+        .filter(c => c.agendamento_id)
+        .map(c => c.agendamento_id!));
+      
+      // Buscar serviços e clientes
+      const servicos = await this.supabase.select('servicos') as Servico[];
+      const clientes = await this.supabase.select('clientes') as Cliente[];
+      
+      let contasCriadas = 0;
+      
+      // Criar contas a receber para agendamentos que não têm conta e têm valor
+      for (const agendamento of agendamentos) {
+        // Pular se já tem conta ou não tem valor
+        if (agendamentosComConta.has(agendamento.id!) || !agendamento.valor_cobrado) {
+          continue;
+        }
+        
+        // Buscar dados relacionados
+        const servico = servicos.find(s => s.id === agendamento.servico_id);
+        const cliente = clientes.find(c => c.id === agendamento.cliente_id);
+        
+        // Data de vencimento: 7 dias após a data do agendamento
+        const dataAgendamento = new Date(agendamento.data_hora);
+        const dataVencimento = new Date(dataAgendamento);
+        dataVencimento.setDate(dataVencimento.getDate() + 7);
+        
+        const descricao = servico?.nome 
+          ? (cliente?.nome ? `${servico.nome} - ${cliente.nome}` : servico.nome)
+          : 'Serviço';
+        
+        // Determinar status e dados de pagamento baseado no agendamento
+        let statusConta = 'pendente';
+        let dataPagamento = null;
+        let formaPagamento = null;
+        
+        // Se o agendamento está concluído e tem data de pagamento, marcar como pago
+        if (agendamento.status === 'concluido' && agendamento.data_pagamento) {
+          statusConta = 'pago';
+          // Garantir que data_pagamento está no formato correto (YYYY-MM-DD)
+          if (typeof agendamento.data_pagamento === 'string') {
+            dataPagamento = agendamento.data_pagamento.split('T')[0];
+          } else {
+            dataPagamento = agendamento.data_pagamento;
+          }
+          formaPagamento = agendamento.forma_pagamento || null;
+        }
+        
+        const contaReceber = {
+          cliente_id: agendamento.cliente_id,
+          agendamento_id: agendamento.id,
+          descricao: descricao,
+          valor: agendamento.valor_cobrado,
+          data_vencimento: dataVencimento.toISOString().split('T')[0],
+          status: statusConta,
+          data_pagamento: dataPagamento,
+          forma_pagamento: formaPagamento,
+          observacoes: `Gerado automaticamente do agendamento #${agendamento.id}`
+        };
+        
+        await this.supabase.insert('contas_receber', contaReceber);
+        contasCriadas++;
+      }
+      
+      // Recarregar contas se foram criadas novas
+      if (contasCriadas > 0) {
+        await this.carregarContas();
+        this.showAlert(`${contasCriadas} conta(s) a receber criada(s) automaticamente!`, 'success');
+      }
+    } catch (error: any) {
+      console.error('Erro ao sincronizar agendamentos:', error);
+      // Não mostrar erro ao usuário, apenas logar
+    }
+  }
+
+  verOrdemServico(agendamentoId: number) {
+    this.router.navigate(['/agendamentos/ordem-servico', agendamentoId]);
   }
 
   showAlert(message: string, type: string) {

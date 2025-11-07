@@ -60,6 +60,7 @@
         <th>Descrição</th>
         <th>Valor</th>
         <th>Forma Pagamento</th>
+        <th>Referência</th>
         <th>Observações</th>
       </tr>
     </thead>
@@ -76,6 +77,18 @@
           {{ movimentacao.tipo === 'entrada' ? '+' : '-' }}{{ formatarMoeda(movimentacao.valor) }}
         </td>
         <td>{{ movimentacao.forma_pagamento || '-' }}</td>
+        <td>
+          <button 
+            *ngIf="temReferencia(movimentacao)" 
+            class="btn btn-primary btn-small" 
+            (click)="verContaRelacionada(movimentacao)"
+            title="Ver conta relacionada"
+            style="font-size: 11px; padding: 4px 8px;"
+          >
+            {{ getReferenciaLabel(movimentacao) }}
+          </button>
+          <span *ngIf="!temReferencia(movimentacao)">-</span>
+        </td>
         <td>{{ movimentacao.observacoes || '-' }}</td>
       </tr>
     </tbody>

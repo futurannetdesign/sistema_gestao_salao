@@ -1,0 +1,109 @@
+<div class="ordem-servico-container">
+  <div class="ordem-servico-actions no-print">
+    <button class="btn btn-secondary" (click)="voltar()">← Voltar</button>
+    <button class="btn btn-primary" (click)="exportarPDF()" [disabled]="exportandoPDF || loading">
+      {{ exportandoPDF ? '⏳ Exportando...' : '📄 Exportar PDF' }}
+    </button>
+    <button class="btn btn-primary" (click)="imprimir()" [disabled]="loading">🖨️ Imprimir</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando ordem de serviço...
+  </div>
+
+  <div *ngIf="!loading && agendamento" #ordemServicoContent class="ordem-servico">
+    <div class="ordem-header">
+      <div class="logo-section">
+        <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="logo-print" />
+        <h1 *ngIf="!logoUrl" class="logo-text-print">{{ nomeSalao }}</h1>
+      </div>
+      <div class="ordem-info">
+        <h2>ORDEM DE SERVIÇO</h2>
+        <p class="ordem-numero">Nº {{ agendamento.id }}</p>
+        <p class="ordem-data">Data: {{ formatarData(agendamento.data_hora) }}</p>
+      </div>
+    </div>
+
+    <div class="ordem-content">
+      <div class="info-section">
+        <h3>Dados do Cliente</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>Nome:</strong> {{ cliente?.nome || '-' }}
+          </div>
+          <div class="info-item">
+            <strong>Celular:</strong> {{ formatarTelefone(cliente?.celular) }}
+          </div>
+          <div class="info-item">
+            <strong>WhatsApp:</strong> {{ formatarTelefone(cliente?.whatsapp) }}
+          </div>
+          <div class="info-item">
+            <strong>Sexo:</strong> {{ cliente?.sexo || '-' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3>Serviço a Realizar</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>Serviço:</strong> {{ servico?.nome || '-' }}
+          </div>
+          <div class="info-item">
+            <strong>Categoria:</strong> {{ servico?.categoria || '-' }}
+          </div>
+          <div class="info-item">
+            <strong>Duração Estimada:</strong> {{ servico?.duracao_estimada || '-' }} minutos
+          </div>
+          <div class="info-item">
+            <strong>Valor:</strong> {{ formatarMoeda(agendamento.valor_cobrado || servico?.valor_padrao) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3>Agendamento</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>Data e Hora:</strong> {{ formatarDataHora(agendamento.data_hora) }}
+          </div>
+          <div class="info-item">
+            <strong>Profissional:</strong> {{ profissional?.nome || 'Não definido' }}
+          </div>
+          <div class="info-item">
+            <strong>Status:</strong> {{ getStatusLabel(agendamento.status) }}
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="agendamento.observacoes" class="info-section">
+        <h3>Observações</h3>
+        <p class="observacoes">{{ agendamento.observacoes }}</p>
+      </div>
+
+      <div *ngIf="servico && servico.observacoes" class="info-section">
+        <h3>Observações do Serviço</h3>
+        <p class="observacoes">{{ servico.observacoes }}</p>
+      </div>
+    </div>
+
+    <div class="ordem-footer">
+      <div class="assinatura-cliente">
+        <p>Assinatura do Cliente</p>
+        <div class="linha-assinatura"></div>
+      </div>
+      <div class="assinatura-profissional">
+        <p>Assinatura do Profissional</p>
+        <div class="linha-assinatura"></div>
+      </div>
+    </div>
+
+    <div class="ordem-rodape">
+      <p>{{ nomeSalao }}</p>
+      <p *ngIf="telefoneSalao">Telefone: {{ telefoneSalao }}</p>
+      <p *ngIf="enderecoSalao">{{ enderecoSalao }}</p>
+      <p class="data-geracao">Gerado em: {{ getDataGeracao() }}</p>
+    </div>
+  </div>
+</div>
+

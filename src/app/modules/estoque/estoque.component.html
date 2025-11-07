@@ -70,12 +70,14 @@
           </span>
         </td>
         <td>
-          <button class="btn btn-edit" (click)="editarProduto(produto.id!)" style="margin-right: 5px;">
-            Editar
-          </button>
-          <button class="btn btn-danger" (click)="excluirProduto(produto.id!)">
-            Excluir
-          </button>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-edit btn-small" (click)="editarProduto(produto.id!)">
+              Editar
+            </button>
+            <button class="btn btn-danger btn-small" (click)="excluirProduto(produto.id!)">
+              ✕
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

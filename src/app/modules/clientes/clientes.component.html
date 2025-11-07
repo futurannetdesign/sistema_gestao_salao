@@ -43,12 +43,14 @@
         <td>{{ formatarTelefone(cliente.whatsapp) }}</td>
         <td>{{ cliente.sexo || '-' }}</td>
         <td>
-          <button class="btn btn-edit" (click)="editarCliente(cliente.id!)" style="margin-right: 5px;">
-            Editar
-          </button>
-          <button class="btn btn-danger" (click)="excluirCliente(cliente.id!)">
-            Excluir
-          </button>
+          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-edit btn-small" (click)="editarCliente(cliente.id!)">
+              Editar
+            </button>
+            <button class="btn btn-danger btn-small" (click)="excluirCliente(cliente.id!)">
+              ✕
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

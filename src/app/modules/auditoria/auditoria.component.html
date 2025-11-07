@@ -1,0 +1,83 @@
+<div class="page-header">
+  <h1>🔍 Auditoria</h1>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div class="card">
+  <div class="filters-bar">
+    <input
+      type="text"
+      placeholder="Buscar por ação, tabela, usuário ou observações..."
+      [(ngModel)]="searchTerm"
+      (input)="filtrarAuditorias()"
+      class="search-input"
+    />
+    <select [(ngModel)]="acaoFiltro" (change)="filtrarAuditorias()" class="filter-select">
+      <option value="">Todas as ações</option>
+      <option *ngFor="let acao of acoes" [value]="acao">{{ getAcaoLabel(acao) }}</option>
+    </select>
+    <select [(ngModel)]="tabelaFiltro" (change)="filtrarAuditorias()" class="filter-select">
+      <option value="">Todas as tabelas</option>
+      <option *ngFor="let tabela of tabelas" [value]="tabela">{{ tabela }}</option>
+    </select>
+    <input
+      type="date"
+      [(ngModel)]="dataInicioFiltro"
+      (change)="filtrarAuditorias()"
+      class="filter-select"
+      placeholder="Data início"
+    />
+    <input
+      type="date"
+      [(ngModel)]="dataFimFiltro"
+      (change)="filtrarAuditorias()"
+      class="filter-select"
+      placeholder="Data fim"
+    />
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Carregando registros de auditoria...
+  </div>
+
+  <div *ngIf="!loading && auditoriasFiltradas.length === 0" class="empty-state">
+    <p>Nenhum registro de auditoria encontrado.</p>
+  </div>
+
+  <table *ngIf="!loading && auditoriasFiltradas.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Data/Hora</th>
+        <th>Ação</th>
+        <th>Tabela</th>
+        <th>Registro ID</th>
+        <th>Usuário</th>
+        <th>Observações</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let auditoria of auditoriasFiltradas">
+        <td>{{ formatarDataHora(auditoria.created_at) }}</td>
+        <td>
+          <span class="badge" [ngClass]="getAcaoBadgeClass(auditoria.acao)">
+            {{ getAcaoLabel(auditoria.acao) }}
+          </span>
+        </td>
+        <td>{{ auditoria.tabela }}</td>
+        <td>{{ auditoria.registro_id || '-' }}</td>
+        <td>{{ auditoria.usuario?.nome || 'Sistema' }}</td>
+        <td>{{ auditoria.observacoes || '-' }}</td>
+        <td>
+          <button class="btn btn-edit btn-small" (click)="verDetalhes(auditoria)">
+            Ver Detalhes
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+

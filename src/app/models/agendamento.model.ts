@@ -11,6 +11,8 @@ export interface Agendamento {
   status: 'agendado' | 'concluido' | 'cancelado';
   observacoes?: string;
   valor_cobrado?: number;
+  data_pagamento?: string;
+  forma_pagamento?: string;
   created_at?: string;
   updated_at?: string;
   cliente?: Cliente;
