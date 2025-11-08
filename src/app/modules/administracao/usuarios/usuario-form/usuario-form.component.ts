@@ -19,6 +19,8 @@ export class UsuarioFormComponent implements OnInit {
   alertType = '';
   alterandoSenha = false;
   mostrarSenha = false;
+  showSuccessPopup = false;
+  successMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -150,22 +152,46 @@ export class UsuarioFormComponent implements OnInit {
 
       // Se há senha, fazer hash
       if (dados.senha && dados.senha.length > 0) {
-        dadosParaSalvar.senha_hash = await this.passwordService.hashPassword(dados.senha);
+        console.log('Gerando hash da senha...');
+        const senhaHash = await this.passwordService.hashPassword(dados.senha);
+        
+        if (!senhaHash || senhaHash.length === 0) {
+          throw new Error('Erro ao gerar hash da senha. Hash vazio retornado.');
+        }
+        
+        console.log('Hash gerado com sucesso. Tamanho:', senhaHash.length);
+        dadosParaSalvar.senha_hash = senhaHash;
       }
 
       if (this.usuarioId) {
         // Atualizar
-        await this.supabase.update('usuarios', this.usuarioId, dadosParaSalvar);
-        this.showAlert('Usuário atualizado com sucesso!', 'success');
+        console.log('Atualizando usuário no banco de dados...');
+        const resultado = await this.supabase.update('usuarios', this.usuarioId, dadosParaSalvar);
+        console.log('Usuário atualizado:', resultado);
+        
+        // Verificar se foi salvo corretamente (especialmente a senha)
+        if (dadosParaSalvar.senha_hash) {
+          const usuariosVerificacao = await this.supabase.select('usuarios', { id: this.usuarioId });
+          if (usuariosVerificacao && usuariosVerificacao.length > 0) {
+            const usuarioAtualizado = usuariosVerificacao[0] as Usuario;
+            if (usuarioAtualizado.senha_hash !== dadosParaSalvar.senha_hash) {
+              throw new Error('A senha não foi atualizada corretamente no banco de dados.');
+            }
+          }
+        }
+        
+        this.mostrarPopupSucesso('Usuário atualizado com sucesso!');
       } else {
         // Criar
-        await this.supabase.insert('usuarios', dadosParaSalvar);
-        this.showAlert('Usuário criado com sucesso!', 'success');
+        console.log('Criando novo usuário no banco de dados...');
+        const resultado = await this.supabase.insert('usuarios', dadosParaSalvar);
+        console.log('Usuário criado:', resultado);
+        this.mostrarPopupSucesso('Usuário criado com sucesso!');
       }
 
       setTimeout(() => {
         this.router.navigate(['/usuarios']);
-      }, 1500);
+      }, 2000);
     } catch (error: any) {
       this.showAlert('Erro ao salvar usuário: ' + error.message, 'danger');
       this.loading = false;
@@ -183,6 +209,18 @@ export class UsuarioFormComponent implements OnInit {
         control.markAsTouched();
       }
     });
+  }
+
+  mostrarPopupSucesso(mensagem: string) {
+    this.successMessage = mensagem;
+    this.showSuccessPopup = true;
+    setTimeout(() => {
+      this.showSuccessPopup = false;
+    }, 5000);
+  }
+  
+  fecharPopupSucesso() {
+    this.showSuccessPopup = false;
   }
 
   showAlert(message: string, type: string) {

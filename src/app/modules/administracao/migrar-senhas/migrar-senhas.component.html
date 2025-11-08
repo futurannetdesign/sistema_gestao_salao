@@ -163,3 +163,14 @@
   </div>
 </div>
 
+<!-- Popup de Sucesso -->
+<div *ngIf="showSuccessPopup" class="success-popup-overlay" (click)="fecharPopupSucesso()">
+  <div class="success-popup-content" (click)="$event.stopPropagation()">
+    <div class="success-popup-icon">✅</div>
+    <h2>Senha Alterada com Sucesso!</h2>
+    <p>A senha do usuário foi alterada com sucesso.</p>
+    <p><strong>Importante:</strong> O usuário precisará usar a nova senha no próximo login.</p>
+    <button class="btn btn-primary" (click)="fecharPopupSucesso()">OK</button>
+  </div>
+</div>
+
