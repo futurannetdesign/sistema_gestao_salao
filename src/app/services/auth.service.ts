@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from './supabase.service';
-import { PasswordService } from './password.service';
 import { Usuario } from '../models/usuario.model';
 
 @Injectable({
@@ -13,69 +12,58 @@ export class AuthService {
 
   constructor(
     private supabase: SupabaseService,
-    private passwordService: PasswordService,
     private router: Router
   ) {
     this.carregarSessao();
+    this.verificarSessaoSupabase();
   }
 
   async login(email: string, senha: string): Promise<{ success: boolean; message: string; usuario?: Usuario }> {
     try {
-      // Buscar usuário por email
+      // Login usando Supabase Auth
+      const { data: authData, error: authError } = await this.supabase.client.auth.signInWithPassword({
+        email: email,
+        password: senha
+      });
+
+      if (authError) {
+        return { success: false, message: 'Email ou senha incorretos!' };
+      }
+
+      if (!authData.user) {
+        return { success: false, message: 'Erro ao realizar login!' };
+      }
+
+      // Buscar dados do usuário na tabela usuarios
       const usuarios = await this.supabase.select('usuarios', { email: email }) as Usuario[];
       
       if (!usuarios || usuarios.length === 0) {
-        return { success: false, message: 'Email ou senha incorretos!' };
-      }
-
-      const usuario = usuarios[0];
-
-      // Verificar se o usuário está ativo
-      if (!usuario.ativo) {
-        return { success: false, message: 'Usuário inativo. Entre em contato com o administrador.' };
-      }
-
-      // Verificar senha
-      if (!usuario.senha_hash) {
-        return { success: false, message: 'Senha não configurada. Entre em contato com o administrador.' };
-      }
-
-      // Verificar se a senha está em texto plano (migração)
-      const isPlainText = this.passwordService.isPlainText(usuario.senha_hash);
-      
-      let senhaValida = false;
-      
-      if (isPlainText) {
-        // Senha em texto plano (migração) - comparar diretamente
-        senhaValida = usuario.senha_hash === senha;
+        // Se não existe na tabela usuarios, criar registro básico
+        const novoUsuario = await this.supabase.insert('usuarios', {
+          email: email,
+          nome: authData.user.email?.split('@')[0] || 'Usuário',
+          perfil: 'funcionario',
+          ativo: true
+        }) as Usuario;
         
-        // Se a senha for válida, fazer hash e atualizar no banco
-        if (senhaValida) {
-          try {
-            const hash = await this.passwordService.hashPassword(senha);
-            await this.supabase.update('usuarios', usuario.id!, { senha_hash: hash });
-          } catch (error: any) {
-            console.error('Erro ao migrar senha para hash:', error);
-            // Continuar com login mesmo se a migração falhar
-          }
-        }
+        this.usuarioLogado = novoUsuario;
       } else {
-        // Senha já está hasheada - verificar usando bcrypt
-        senhaValida = await this.passwordService.verifyPassword(senha, usuario.senha_hash);
-      }
+        const usuario = usuarios[0];
 
-      if (!senhaValida) {
-        return { success: false, message: 'Email ou senha incorretos!' };
-      }
+        // Verificar se o usuário está ativo
+        if (!usuario.ativo) {
+          await this.supabase.client.auth.signOut();
+          return { success: false, message: 'Usuário inativo. Entre em contato com o administrador.' };
+        }
 
-      // Salvar sessão
-      this.usuarioLogado = {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        perfil: usuario.perfil,
-        ativo: usuario.ativo
-      };
+        this.usuarioLogado = {
+          id: usuario.id,
+          nome: usuario.nome,
+          email: usuario.email,
+          perfil: usuario.perfil,
+          ativo: usuario.ativo
+        };
+      }
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.usuarioLogado));
 
@@ -85,10 +73,40 @@ export class AuthService {
     }
   }
 
-  logout() {
+  async logout() {
+    // Fazer logout do Supabase Auth
+    await this.supabase.client.auth.signOut();
+    
     this.usuarioLogado = null;
     localStorage.removeItem(this.STORAGE_KEY);
     this.router.navigate(['/login']);
+  }
+
+  private async verificarSessaoSupabase() {
+    // Verificar se há sessão ativa no Supabase
+    const { data: { session } } = await this.supabase.client.auth.getSession();
+    
+    if (session) {
+      // Carregar dados do usuário se houver sessão
+      const usuarios = await this.supabase.select('usuarios', { email: session.user.email }) as Usuario[];
+      if (usuarios && usuarios.length > 0) {
+        const usuario = usuarios[0];
+        if (usuario.ativo) {
+          this.usuarioLogado = {
+            id: usuario.id,
+            nome: usuario.nome,
+            email: usuario.email,
+            perfil: usuario.perfil,
+            ativo: usuario.ativo
+          };
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.usuarioLogado));
+        }
+      }
+    } else {
+      // Se não há sessão, limpar dados locais
+      this.usuarioLogado = null;
+      localStorage.removeItem(this.STORAGE_KEY);
+    }
   }
 
   isAuthenticated(): boolean {

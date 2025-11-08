@@ -34,9 +34,11 @@ import { SupabaseService } from './services/supabase.service';
 import { AuditoriaService } from './services/auditoria.service';
 import { AuthService } from './services/auth.service';
 import { PasswordService } from './services/password.service';
+import { PasswordUpdateService } from './services/password-update.service';
 import { PermissaoService } from './services/permissao.service';
 import { AuthGuard } from './guards/auth.guard';
 import { PermissaoGuard } from './guards/permissao.guard';
+import { HttpClientModule } from '@angular/common/http';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -116,9 +118,10 @@ const routes: Routes = [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
     RouterModule.forRoot(routes)
   ],
-  providers: [SupabaseService, AuditoriaService, AuthService, PasswordService, PermissaoService, AuthGuard, PermissaoGuard],
+  providers: [SupabaseService, AuditoriaService, AuthService, PasswordService, PasswordUpdateService, PermissaoService, AuthGuard, PermissaoGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

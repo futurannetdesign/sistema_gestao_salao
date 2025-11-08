@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SupabaseService } from '../../../../services/supabase.service';
-import { PasswordService } from '../../../../services/password.service';
 import { AuthService } from '../../../../services/auth.service';
+import { PasswordUpdateService } from '../../../../services/password-update.service';
 import { Usuario } from '../../../../models/usuario.model';
 
 @Component({
@@ -22,14 +22,14 @@ export class UsuarioFormComponent implements OnInit {
   showSuccessPopup = false;
   successMessage = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private supabase: SupabaseService,
-    private passwordService: PasswordService,
-    public authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+      constructor(
+        private fb: FormBuilder,
+        private supabase: SupabaseService,
+        public authService: AuthService,
+        private passwordUpdateService: PasswordUpdateService,
+        private route: ActivatedRoute,
+        private router: Router
+      ) {
     this.usuarioForm = this.fb.group({
       nome: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -142,51 +142,78 @@ export class UsuarioFormComponent implements OnInit {
     try {
       this.loading = true;
 
-      // Preparar dados para salvar
-      const dadosParaSalvar: any = {
-        nome: dados.nome,
-        email: dados.email,
-        perfil: dados.perfil,
-        ativo: dados.ativo !== false
-      };
-
-      // Se há senha, fazer hash
-      if (dados.senha && dados.senha.length > 0) {
-        console.log('Gerando hash da senha...');
-        const senhaHash = await this.passwordService.hashPassword(dados.senha);
-        
-        if (!senhaHash || senhaHash.length === 0) {
-          throw new Error('Erro ao gerar hash da senha. Hash vazio retornado.');
-        }
-        
-        console.log('Hash gerado com sucesso. Tamanho:', senhaHash.length);
-        dadosParaSalvar.senha_hash = senhaHash;
-      }
-
       if (this.usuarioId) {
-        // Atualizar
-        console.log('Atualizando usuário no banco de dados...');
-        const resultado = await this.supabase.update('usuarios', this.usuarioId, dadosParaSalvar);
-        console.log('Usuário atualizado:', resultado);
+        // Atualizar usuário existente
+        // Preparar dados para salvar na tabela usuarios
+        const dadosParaSalvar: any = {
+          nome: dados.nome,
+          email: dados.email,
+          perfil: dados.perfil,
+          ativo: dados.ativo !== false
+        };
+
+        // Atualizar na tabela usuarios
+        await this.supabase.update('usuarios', this.usuarioId, dadosParaSalvar);
         
-        // Verificar se foi salvo corretamente (especialmente a senha)
-        if (dadosParaSalvar.senha_hash) {
-          const usuariosVerificacao = await this.supabase.select('usuarios', { id: this.usuarioId });
-          if (usuariosVerificacao && usuariosVerificacao.length > 0) {
-            const usuarioAtualizado = usuariosVerificacao[0] as Usuario;
-            if (usuarioAtualizado.senha_hash !== dadosParaSalvar.senha_hash) {
-              throw new Error('A senha não foi atualizada corretamente no banco de dados.');
-            }
+        // Se há senha, atualizar no Supabase Auth usando API REST
+        if (dados.senha && dados.senha.length > 0) {
+          // Buscar o email do usuário (usar o email atualizado ou o antigo)
+          const emailParaAtualizar = dados.email || (await this.supabase.select('usuarios', { id: this.usuarioId }) as Usuario[])[0]?.email;
+          
+          if (!emailParaAtualizar) {
+            throw new Error('Email do usuário não encontrado');
           }
+          
+          // Atualizar senha usando API REST do Supabase
+          try {
+            const resultado = await this.passwordUpdateService.updateUserPassword(emailParaAtualizar, dados.senha);
+            
+            if (resultado.success) {
+              this.mostrarPopupSucesso('Usuário e senha atualizados com sucesso!');
+            } else {
+              throw new Error(resultado.message);
+            }
+          } catch (error: any) {
+            const errorMessage = error.message || 'Erro desconhecido';
+            
+            // Verificar se é erro de Service Role Key não configurada
+            if (errorMessage.includes('Service Role Key não configurada')) {
+              console.error('UsuarioFormComponent: Service Role Key não configurada');
+              this.showAlert(
+                '⚠️ ERRO: Service Role Key não configurada! Adicione "supabaseServiceRoleKey" no arquivo environment.ts e environment.prod.ts. Consulte CONFIGURAR_SERVICE_ROLE_KEY.md para instruções.',
+                'danger'
+              );
+            } else {
+              console.error('UsuarioFormComponent: Erro ao atualizar senha:', errorMessage);
+              this.showAlert(
+                '⚠️ Usuário atualizado, mas erro ao alterar senha: ' + errorMessage,
+                'warning'
+              );
+            }
+            this.mostrarPopupSucesso('Usuário atualizado! Erro ao alterar senha (veja aviso)');
+          }
+        } else {
+          // Se não há senha, apenas atualizar dados
+          this.mostrarPopupSucesso('Usuário atualizado com sucesso!');
         }
-        
-        this.mostrarPopupSucesso('Usuário atualizado com sucesso!');
       } else {
-        // Criar
-        console.log('Criando novo usuário no banco de dados...');
-        const resultado = await this.supabase.insert('usuarios', dadosParaSalvar);
-        console.log('Usuário criado:', resultado);
-        this.mostrarPopupSucesso('Usuário criado com sucesso!');
+        // Criar novo usuário
+        // Criar registro na tabela usuarios
+        const dadosParaSalvar: any = {
+          nome: dados.nome,
+          email: dados.email,
+          perfil: dados.perfil,
+          ativo: dados.ativo !== false
+        };
+
+        await this.supabase.insert('usuarios', dadosParaSalvar);
+        
+        // Avisar que precisa criar no Supabase Auth
+        this.showAlert(
+          '✅ Usuário criado na tabela! Agora crie o usuário no Supabase Auth: Authentication > Users > Add user (Email: ' + dados.email + ' | Senha: [senha informada])',
+          'info'
+        );
+        this.mostrarPopupSucesso('Usuário criado! Crie no Supabase Auth para fazer login.');
       }
 
       setTimeout(() => {

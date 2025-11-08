@@ -41,7 +41,11 @@
         <label>
           {{ usuarioId ? 'Nova Senha' : 'Senha' }} 
           <span *ngIf="!usuarioId">*</span>
-          <small *ngIf="usuarioId">(deixe em branco para manter a senha atual)</small>
+          <small *ngIf="usuarioId" style="color: #666; font-size: 12px;">
+            (deixe em branco para manter a senha atual)
+            <br>
+            <strong style="color: #ff9800;">⚠️ Atenção:</strong> Ao alterar a senha, será enviado um email de recuperação para o usuário. Ou altere manualmente no Supabase Dashboard.
+          </small>
         </label>
         <div style="position: relative;">
           <input 

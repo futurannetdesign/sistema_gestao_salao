@@ -1,34 +1,14 @@
 # 🔐 Credenciais de Acesso - Sistema de Gestão
 
-## 👤 Administrador
-
-**Email:** `admin@salao.com`  
-**Senha:** `admin123`
-
-**Perfil:** Administrador (acesso total)
-
----
-
-## 👤 Funcionário
-
-**Email:** `funcionario@salao.com`  
-**Senha:** `func123`
-
-**Perfil:** Funcionário (acesso limitado conforme permissões)
-
----
-
 ## ⚠️ IMPORTANTE - Segurança
 
-### ⚠️ ALTERE AS SENHAS APÓS O PRIMEIRO LOGIN!
+### 🔒 Senhas Padrão Foram Alteradas
 
-As senhas padrão são apenas para desenvolvimento e testes. Em produção:
+As senhas padrão foram alteradas por questões de segurança. Para acessar o sistema:
 
-1. **Faça login como Administrador**
-2. **Acesse Configurações** (se disponível)
-3. **Altere a senha do administrador**
-4. **Crie novos usuários com senhas seguras**
-5. **Configure permissões adequadas para funcionários**
+1. **Entre em contato com o administrador** para obter as credenciais de acesso
+2. **Ou acesse o Supabase Dashboard** > Authentication > Users para gerenciar usuários
+3. **Crie novos usuários** com senhas seguras através do sistema
 
 ### 🔒 Senhas Seguras
 
@@ -40,12 +20,19 @@ Use senhas que contenham:
 
 **Exemplo de senha segura:** `Admin@2024!`
 
+### 📝 Gerenciamento de Usuários
+
+1. **Faça login como Administrador**
+2. **Acesse Administração** > **Usuários**
+3. **Crie novos usuários** com senhas seguras
+4. **Configure permissões adequadas** para funcionários
+
 ---
 
 ## 📝 Notas
 
-- As senhas são armazenadas com hash bcrypt (após primeiro login)
-- O sistema migra automaticamente senhas em texto plano para hash
+- O sistema usa **Supabase Auth** para autenticação segura
+- As senhas são armazenadas com hash seguro pelo Supabase
 - Consulte `SEGURANCA.md` para mais informações sobre segurança
 
 ---
@@ -58,28 +45,21 @@ Use senhas que contenham:
 
 ## 🔄 Como Alterar Senhas
 
-### Via Sistema (quando implementado):
+### Via Sistema (Recomendado):
 
-1. Faça login
-2. Acesse **Configurações** > **Alterar Senha**
-3. Digite a senha atual
-4. Digite a nova senha
-5. Confirme a nova senha
-6. Salve
+1. Faça login como Administrador
+2. Acesse **Administração** > **Usuários**
+3. Clique em **Editar** no usuário desejado
+4. Preencha a nova senha e confirme
+5. Clique em **Salvar**
 
-### Via Banco de Dados (apenas para administradores):
+### Via Supabase Dashboard (Alternativa):
 
-Execute no Supabase SQL Editor:
-
-```sql
--- Alterar senha do admin (substitua 'nova_senha_segura' pela senha desejada)
--- A senha será hasheada automaticamente no próximo login
-UPDATE usuarios 
-SET senha_hash = 'nova_senha_segura' 
-WHERE email = 'admin@salao.com';
-```
-
-⚠️ **ATENÇÃO:** Se o sistema já estiver usando hash de senhas, você precisará usar a Edge Function `hash-password` para gerar o hash antes de atualizar.
+1. Acesse o Supabase Dashboard
+2. Vá em **Authentication** > **Users**
+3. Selecione o usuário desejado
+4. Clique em **"..."** > **"Reset password"**
+5. Defina a nova senha
 
 ---
 

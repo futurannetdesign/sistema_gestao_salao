@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { SupabaseService } from "../../../services/supabase.service";
-import { PasswordService } from "../../../services/password.service";
 import { AuthService } from "../../../services/auth.service";
 import { Usuario } from "../../../models/usuario.model";
 
@@ -29,7 +28,6 @@ export class MigrarSenhasComponent implements OnInit {
 
   constructor(
     private supabase: SupabaseService,
-    private passwordService: PasswordService,
     public authService: AuthService,
     private router: Router
   ) {}
@@ -49,11 +47,9 @@ export class MigrarSenhasComponent implements OnInit {
       this.loading = true;
       this.usuarios = (await this.supabase.select("usuarios")) as Usuario[];
 
-      // Filtrar usuários com senha em texto plano
-      this.usuariosComSenhaPlana = this.usuarios.filter((usuario) => {
-        if (!usuario.senha_hash) return false;
-        return this.passwordService.isPlainText(usuario.senha_hash);
-      });
+      // Com Supabase Auth, não precisamos mais verificar senhas em texto plano
+      // Todos os usuários devem estar no Supabase Auth
+      this.usuariosComSenhaPlana = [];
 
       this.loading = false;
     } catch (error: any) {
@@ -117,50 +113,44 @@ export class MigrarSenhasComponent implements OnInit {
         this.usuarioSelecionado.id
       );
 
-      // Fazer hash da nova senha
-      console.log("Gerando hash da senha...");
-      const senhaHash = await this.passwordService.hashPassword(this.novaSenha);
-
-      if (!senhaHash || senhaHash.length === 0) {
-        throw new Error("Erro ao gerar hash da senha. Hash vazio retornado.");
-      }
-
-      console.log("Hash gerado com sucesso. Tamanho:", senhaHash.length);
-
-      // Atualizar no banco
-      console.log("Atualizando senha no banco de dados...");
-      const resultado = await this.supabase.update(
-        "usuarios",
-        this.usuarioSelecionado.id!,
-        {
-          senha_hash: senhaHash,
-        }
-      );
-
-      console.log("Senha atualizada no banco:", resultado);
-
-      // Verificar se foi salvo corretamente
-      const usuariosVerificacao = await this.supabase.select("usuarios", {
-        id: this.usuarioSelecionado.id,
-      });
-      if (usuariosVerificacao && usuariosVerificacao.length > 0) {
-        const usuarioAtualizado = usuariosVerificacao[0] as Usuario;
-        console.log(
-          "Senha no banco após update:",
-          usuarioAtualizado.senha_hash?.substring(0, 20) + "..."
+      // Atualizar senha no Supabase Auth
+      // Nota: O Supabase Auth não permite alterar senha de outro usuário diretamente do cliente
+      // A melhor forma é usar recuperação de senha ou alterar manualmente no Dashboard
+      console.log("Enviando email de recuperação de senha para:", this.usuarioSelecionado.email);
+      
+      // Enviar email de recuperação de senha
+      try {
+        const { error: recoveryError } = await this.supabase.client.auth.resetPasswordForEmail(
+          this.usuarioSelecionado.email!,
+          {
+            redirectTo: window.location.origin + '/login'
+          }
         );
 
-        if (usuarioAtualizado.senha_hash !== senhaHash) {
-          throw new Error(
-            "A senha não foi atualizada corretamente no banco de dados."
+        if (recoveryError) {
+          console.error("Erro ao enviar email de recuperação:", recoveryError);
+          this.showAlert(
+            '⚠️ Não foi possível enviar email de recuperação. Para alterar a senha, acesse: Supabase Dashboard > Authentication > Users > Selecione o usuário "' + this.usuarioSelecionado.email + '" > Clique em "..." > "Reset password" e defina a nova senha: "' + this.novaSenha + '"',
+            'warning'
           );
+          this.fecharModalAlterarSenha();
+        } else {
+          this.showAlert(
+            '✅ Email de recuperação de senha enviado para: ' + this.usuarioSelecionado.email + '. O usuário precisará usar o link do email para definir a nova senha: "' + this.novaSenha + '"',
+            'info'
+          );
+          this.mostrarPopupSucesso();
+          this.fecharModalAlterarSenha();
+          await this.carregarUsuarios();
         }
+      } catch (error: any) {
+        console.error("Erro ao alterar senha:", error);
+        this.showAlert(
+          '⚠️ Para alterar a senha, acesse: Supabase Dashboard > Authentication > Users > Selecione o usuário "' + this.usuarioSelecionado.email + '" > Clique em "..." > "Reset password" e defina a nova senha: "' + this.novaSenha + '"',
+          'warning'
+        );
+        this.fecharModalAlterarSenha();
       }
-
-      // Mostrar popup de sucesso
-      this.mostrarPopupSucesso();
-      this.fecharModalAlterarSenha();
-      await this.carregarUsuarios(); // Recarregar lista
     } catch (error: any) {
       console.error("Erro ao alterar senha:", error);
       this.showAlert(
