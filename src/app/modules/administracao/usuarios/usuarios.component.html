@@ -1,0 +1,89 @@
+<div class="page-header">
+  <h1>👥 Gerenciar Usuários</h1>
+  <button class="btn btn-primary" (click)="novoUsuario()" *ngIf="authService.isAdmin()">
+    + Novo Usuário
+  </button>
+</div>
+
+<div *ngIf="alertMessage" class="alert alert-{{alertType}}">
+  {{ alertMessage }}
+</div>
+
+<div *ngIf="!authService.isAdmin()" class="alert alert-danger">
+  Apenas administradores podem gerenciar usuários!
+</div>
+
+<div *ngIf="authService.isAdmin() && !loading" class="card">
+  <div class="search-bar">
+    <input
+      type="text"
+      [(ngModel)]="termoBusca"
+      (input)="filtrarUsuarios()"
+      placeholder="Buscar por nome ou email..."
+      class="form-control"
+    />
+  </div>
+
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Perfil</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuariosFiltrados">
+          <td>{{ usuario.id }}</td>
+          <td>{{ usuario.nome }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="usuario.perfil === 'admin'">
+              {{ usuario.perfil === 'admin' ? '👑 Admin' : '👤 Funcionário' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="usuario.ativo" [class.badge-danger]="!usuario.ativo">
+              {{ usuario.ativo ? 'Ativo' : 'Inativo' }}
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 5px; align-items: center; flex-wrap: nowrap;">
+              <button class="btn btn-edit btn-small" (click)="editarUsuario(usuario.id!)" title="Editar usuário">
+                Editar
+              </button>
+              <button 
+                *ngIf="usuario.ativo" 
+                class="btn btn-danger btn-small" 
+                (click)="excluirUsuario(usuario.id!)"
+                title="Desativar usuário"
+              >
+                ✕
+              </button>
+              <button 
+                *ngIf="!usuario.ativo" 
+                class="btn btn-success btn-small" 
+                (click)="ativarUsuario(usuario.id!)"
+                title="Ativar usuário"
+              >
+                ✓
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="usuariosFiltrados.length === 0">
+          <td colspan="6" class="text-center">Nenhum usuário encontrado</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading">
+  Carregando usuários...
+</div>
+

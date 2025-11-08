@@ -1,5 +1,8 @@
 <div class="page-header">
-  <h1>🔐 Migrar Senhas para Hash</h1>
+  <h1>🔐 Gerenciar Senhas e Usuários</h1>
+  <button class="btn btn-primary" (click)="criarNovoUsuario()" *ngIf="authService.isAdmin()">
+    + Novo Usuário
+  </button>
 </div>
 
 <div *ngIf="alertMessage" class="alert alert-{{alertType}}">
@@ -7,7 +10,7 @@
 </div>
 
 <div *ngIf="!authService.isAdmin()" class="alert alert-danger">
-  Apenas administradores podem migrar senhas!
+  Apenas administradores podem gerenciar senhas e usuários!
 </div>
 
 <div *ngIf="authService.isAdmin() && !loading" class="card">
@@ -28,7 +31,7 @@
       <li>O sistema detecta senhas em texto plano automaticamente</li>
       <li>No primeiro login, a senha é verificada e migrada para hash</li>
       <li>O processo é transparente para o usuário</li>
-      <li>Não é necessário migrar manualmente</li>
+      <li>Você também pode alterar a senha manualmente usando o botão abaixo</li>
     </ul>
   </div>
 
@@ -63,7 +66,47 @@
             <span class="badge badge-warning">Senha em Texto Plano</span>
           </td>
           <td>
-            <span class="badge badge-info">Migração Automática</span>
+            <button class="btn btn-primary btn-small" (click)="abrirModalAlterarSenha(usuario)">
+              🔑 Alterar Senha
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="usuarios-lista" style="margin-top: 30px;">
+    <h3>Todos os Usuários</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Perfil</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios">
+          <td>{{ usuario.id }}</td>
+          <td>{{ usuario.nome }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <span class="badge" [class.badge-success]="usuario.perfil === 'admin'">
+              {{ usuario.perfil === 'admin' ? 'Admin' : 'Funcionário' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="usuario.ativo" [class.badge-danger]="!usuario.ativo">
+              {{ usuario.ativo ? 'Ativo' : 'Inativo' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-primary btn-small" (click)="abrirModalAlterarSenha(usuario)">
+              🔑 Alterar Senha
+            </button>
           </td>
         </tr>
       </tbody>
@@ -73,5 +116,50 @@
 
 <div *ngIf="loading" class="loading">
   Carregando usuários...
+</div>
+
+<!-- Modal de Alterar Senha -->
+<div *ngIf="showModalAlterarSenha" class="modal-overlay" (click)="fecharModalAlterarSenha()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Alterar Senha</h2>
+      <button class="btn-close" (click)="fecharModalAlterarSenha()">×</button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="usuarioSelecionado">
+        <p><strong>Usuário:</strong> {{ usuarioSelecionado.nome }}</p>
+        <p><strong>Email:</strong> {{ usuarioSelecionado.email }}</p>
+      </div>
+      <div class="form-group" style="margin-top: 20px;">
+        <label>Nova Senha *</label>
+        <input 
+          type="password" 
+          [(ngModel)]="novaSenha" 
+          class="form-control" 
+          placeholder="Mínimo 6 caracteres"
+          [disabled]="alterandoSenha"
+        />
+      </div>
+      <div class="form-group">
+        <label>Confirmar Senha *</label>
+        <input 
+          type="password" 
+          [(ngModel)]="confirmarSenha" 
+          class="form-control" 
+          placeholder="Digite a senha novamente"
+          [disabled]="alterandoSenha"
+        />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="fecharModalAlterarSenha()" [disabled]="alterandoSenha">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="alterarSenha()" [disabled]="alterandoSenha">
+        <span *ngIf="!alterandoSenha">Alterar Senha</span>
+        <span *ngIf="alterandoSenha">Alterando...</span>
+      </button>
+    </div>
+  </div>
 </div>
 

@@ -77,6 +77,9 @@
         </div>
         <div class="nav-section" *ngIf="authService.isAdmin()">
           <span class="nav-section-title">⚙️ Administração</span>
+          <a routerLink="/usuarios" routerLinkActive="active" (click)="menuOpen = false">
+            <span>👥</span> Usuários
+          </a>
           <a routerLink="/configuracoes" routerLinkActive="active" (click)="menuOpen = false">
             <span>⚙️</span> Configurações
           </a>

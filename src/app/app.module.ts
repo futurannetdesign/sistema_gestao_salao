@@ -24,6 +24,8 @@ import { ProfissionalFormComponent } from './modules/profissionais/profissional-
 import { ConfiguracoesComponent } from './modules/administracao/configuracoes/configuracoes.component';
 import { PermissoesComponent } from './modules/administracao/permissoes/permissoes.component';
 import { MigrarSenhasComponent } from './modules/administracao/migrar-senhas/migrar-senhas.component';
+import { UsuariosComponent } from './modules/administracao/usuarios/usuarios.component';
+import { UsuarioFormComponent } from './modules/administracao/usuarios/usuario-form/usuario-form.component';
 import { OrdemServicoComponent } from './modules/ordem-servico/ordem-servico.component';
 import { AuditoriaComponent } from './modules/auditoria/auditoria.component';
 import { LoginComponent } from './modules/login/login.component';
@@ -72,6 +74,9 @@ const routes: Routes = [
       { path: 'configuracoes', component: ConfiguracoesComponent },
       { path: 'permissoes', component: PermissoesComponent },
       { path: 'migrar-senhas', component: MigrarSenhasComponent },
+      { path: 'usuarios', component: UsuariosComponent },
+      { path: 'usuarios/novo', component: UsuarioFormComponent },
+      { path: 'usuarios/editar/:id', component: UsuarioFormComponent },
       { path: 'auditoria', component: AuditoriaComponent }
     ]
   }
@@ -101,6 +106,8 @@ const routes: Routes = [
     ConfiguracoesComponent,
     PermissoesComponent,
     MigrarSenhasComponent,
+    UsuariosComponent,
+    UsuarioFormComponent,
     OrdemServicoComponent,
     AuditoriaComponent,
     LoginComponent

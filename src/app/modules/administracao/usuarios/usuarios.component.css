@@ -1,0 +1,75 @@
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  max-width: 400px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+}
+
+.table th {
+  background-color: var(--primary-color);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.table td {
+  background-color: var(--white);
+}
+
+.badge {
+  background-color: #6c757d;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.text-center {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
+
+.table td > div {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .table td > div {
+    flex-wrap: wrap;
+  }
+}
+
