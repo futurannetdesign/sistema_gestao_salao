@@ -15,7 +15,7 @@ export class PermissoesComponent implements OnInit {
   loading = true;
   alertMessage = '';
   alertType = '';
-  perfilSelecionado: 'admin' | 'funcionario' = 'funcionario';
+  perfilSelecionado: 'admin' | 'gerente' | 'funcionario' = 'funcionario';
 
   modulos: { key: ModuloPermissao; label: string }[] = [
     { key: 'dashboard', label: 'Dashboard' },

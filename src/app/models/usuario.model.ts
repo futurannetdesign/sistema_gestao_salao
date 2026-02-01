@@ -3,7 +3,7 @@ export interface Usuario {
   nome: string;
   email: string;
   senha_hash?: string;
-  perfil: 'admin' | 'funcionario';
+  perfil: 'admin' | 'gerente' | 'funcionario';
   ativo?: boolean;
   salao_id?: string;
   created_at?: string;

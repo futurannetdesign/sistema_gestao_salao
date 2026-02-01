@@ -123,6 +123,17 @@ export class ConfiguracoesComponent implements OnInit {
         }
       }
 
+      // NOVO: Atualizar também a tabela de SALÕES (Nome Oficial do SaaS)
+      // Como estamos com RLS ativo, o update sem WHERE vai atualizar apenas o "meu salão"
+      // ou precisamos pegar o ID do salão do usuário.
+      const meuSalao = await this.supabase.select('saloes');
+      if (meuSalao && meuSalao.length > 0) {
+         await this.supabase.update('saloes', meuSalao[0].id, { 
+             nome: valores['nome_salao'],
+             // logo_url: valores['logo_url'] // Se adicionar coluna logo na tabela saloes
+         });
+      }
+
       this.showAlert('Configurações salvas com sucesso!', 'success');
       this.loading = false;
       

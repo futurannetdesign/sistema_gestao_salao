@@ -1,6 +1,6 @@
 export interface Permissao {
   id?: number;
-  perfil: 'admin' | 'funcionario';
+  perfil: 'admin' | 'gerente' | 'funcionario';
   modulo: string;
   acao: 'visualizar' | 'criar' | 'editar' | 'excluir' | 'marcar_pago' | 'sincronizar';
   permitido: boolean;

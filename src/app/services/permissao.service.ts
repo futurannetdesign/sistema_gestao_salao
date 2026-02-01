@@ -56,7 +56,7 @@ export class PermissaoService {
     }
   }
 
-  async carregarPermissoesPerfil(perfil: 'admin' | 'funcionario'): Promise<Permissao[]> {
+  async carregarPermissoesPerfil(perfil: 'admin' | 'gerente' | 'funcionario'): Promise<Permissao[]> {
     try {
       const permissoes = await this.supabase.select('permissoes', { perfil: perfil }) as Permissao[];
       return permissoes || [];
@@ -66,7 +66,7 @@ export class PermissaoService {
     }
   }
 
-  async atualizarPermissao(perfil: 'admin' | 'funcionario', modulo: ModuloPermissao, acao: AcaoPermissao, permitido: boolean): Promise<void> {
+  async atualizarPermissao(perfil: 'admin' | 'gerente' | 'funcionario', modulo: ModuloPermissao, acao: AcaoPermissao, permitido: boolean): Promise<void> {
     try {
       // Buscar permissão existente
       const permissoes = await this.supabase.select('permissoes', {

@@ -3,6 +3,7 @@
   <div class="header-actions">
     <select [(ngModel)]="perfilSelecionado" (change)="onPerfilChange()" class="form-control" style="width: 200px;">
       <option value="funcionario">Funcionário</option>
+      <option value="gerente">Gerente</option>
       <option value="admin">Administrador</option>
     </select>
   </div>
@@ -18,9 +19,10 @@
 
 <div *ngIf="authService.isAdmin() && !loading" class="card">
   <div class="permissoes-info">
-    <p><strong>Perfil:</strong> {{ perfilSelecionado === 'admin' ? 'Administrador' : 'Funcionário' }}</p>
+    <p><strong>Perfil:</strong> {{ perfilSelecionado === 'admin' ? 'Administrador' : (perfilSelecionado === 'gerente' ? 'Gerente' : 'Funcionário') }}</p>
     <p class="info-text">
       <strong>Administrador:</strong> Tem acesso total a todas as funcionalidades do sistema.<br>
+      <strong>Gerente:</strong> Acesso configurável. Geralmente Financeiro e Relatórios.<br>
       <strong>Funcionário:</strong> Permissões configuráveis abaixo. Marque as ações permitidas.
     </p>
   </div>
