@@ -5,6 +5,7 @@ export interface Usuario {
   senha_hash?: string;
   perfil: 'admin' | 'funcionario';
   ativo?: boolean;
+  salao_id?: string;
   created_at?: string;
   updated_at?: string;
 }

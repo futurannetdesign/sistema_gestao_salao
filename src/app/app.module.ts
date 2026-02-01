@@ -5,8 +5,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { ClientesComponent } from './modules/clientes/clientes.component';
-import { ClienteFormComponent } from './modules/clientes/cliente-form/cliente-form.component';
 import { ServicosComponent } from './modules/servicos/servicos.component';
 import { ServicoFormComponent } from './modules/servicos/servico-form/servico-form.component';
 import { AgendamentosComponent } from './modules/agendamentos/agendamentos.component';
@@ -49,9 +47,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'dashboard', component: DashboardComponent },
-      { path: 'clientes', component: ClientesComponent },
-      { path: 'clientes/novo', component: ClienteFormComponent },
-      { path: 'clientes/editar/:id', component: ClienteFormComponent },
+      { path: 'clientes', loadChildren: () => import('./modules/clientes/clientes.module').then(m => m.ClientesModule) },
       { path: 'servicos', component: ServicosComponent },
       { path: 'servicos/novo', component: ServicoFormComponent },
       { path: 'servicos/editar/:id', component: ServicoFormComponent },
@@ -89,8 +85,6 @@ const routes: Routes = [
     AppComponent,
     LayoutComponent,
     DashboardComponent,
-    ClientesComponent,
-    ClienteFormComponent,
     ServicosComponent,
     ServicoFormComponent,
     AgendamentosComponent,

@@ -42,6 +42,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.usuarioLogado = this.authService.getUsuarioLogado();
     await Promise.all([
+      this.carregarDadosSalao(),
       this.carregarConfiguracoes(),
       this.carregarPermissoesMenu()
     ]);
@@ -50,6 +51,21 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.intervalId = setInterval(() => {
       this.atualizarDataHora();
     }, 60000);
+  }
+
+  async carregarDadosSalao() {
+    try {
+      // Com RLS, só retorna o salão do usuário
+      const saloes = await this.supabase.select('saloes'); 
+      if (saloes && saloes.length > 0) {
+        const meuSalao = saloes[0];
+        this.nomeSalao = meuSalao.nome;
+        // Se tiver logo na tabela saloes, usar. Senão manter da config ou padrão.
+        // this.logoUrl = meuSalao.logo_url; 
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados do salão:', error);
+    }
   }
 
   async carregarPermissoesMenu() {
@@ -103,7 +119,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
         configMap[config.chave] = config.valor;
       });
 
-      this.nomeSalao = configMap['nome_salao'] || 'Embeleze-se';
+      // Prioridade: Configuração > Nome do Salão (Banco) > Padrão
+      if (configMap['nome_salao']) {
+        this.nomeSalao = configMap['nome_salao'];
+      }
       this.logoUrl = configMap['logo_url'] || null;
     } catch (error: any) {
       console.error('Erro ao carregar configurações:', error);
