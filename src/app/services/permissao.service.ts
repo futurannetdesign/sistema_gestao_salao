@@ -80,11 +80,13 @@ export class PermissaoService {
         await this.supabase.update('permissoes', permissoes[0].id!, { permitido: permitido });
       } else {
         // Criar nova permissão
+        const usuario = this.authService.getUsuarioLogado();
         await this.supabase.insert('permissoes', {
           perfil: perfil,
           modulo: modulo,
           acao: acao,
-          permitido: permitido
+          permitido: permitido,
+          salao_id: (usuario as any)?.salao_id
         });
       }
 

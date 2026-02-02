@@ -18,13 +18,8 @@
 
 <div class="card">
   <div class="filters-bar">
-    <input
-      type="text"
-      placeholder="Buscar por nome, descrição ou categoria..."
-      [(ngModel)]="searchTerm"
-      (input)="filtrarProdutos()"
-      class="search-input"
-    />
+    <input type="text" placeholder="Buscar por nome, descrição ou categoria..." [(ngModel)]="searchTerm"
+      (input)="filtrarProdutos()" class="search-input" />
     <select [(ngModel)]="categoriaFiltro" (change)="filtrarProdutos()" class="filter-select">
       <option value="">Todas as categorias</option>
       <option *ngFor="let cat of getCategorias()" [value]="cat">{{ cat }}</option>
@@ -39,50 +34,50 @@
     <p>Nenhum produto encontrado.</p>
   </div>
 
-  <table *ngIf="!loading && produtosFiltrados.length > 0" class="table">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Categoria</th>
-        <th>Fornecedor</th>
-        <th>Quantidade Atual</th>
-        <th>Quantidade Mínima</th>
-        <th>Unidade</th>
-        <th>Valor Unitário</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let produto of produtosFiltrados" [class.baixo-estoque]="isBaixoEstoque(produto)">
-        <td>{{ produto.nome }}</td>
-        <td>{{ produto.categoria || '-' }}</td>
-        <td>{{ produto.fornecedor?.nome || '-' }}</td>
-        <td>
-          <span [ngClass]="isBaixoEstoque(produto) ? 'badge badge-danger' : ''">
-            {{ produto.quantidade_atual }}
-          </span>
-        </td>
-        <td>{{ produto.quantidade_minima }}</td>
-        <td>{{ produto.unidade_medida || 'unidade' }}</td>
-        <td>{{ formatarMoeda(produto.valor_unitario) }}</td>
-        <td>
-          <span class="badge" [class.badge-success]="produto.ativo" [class.badge-danger]="!produto.ativo">
-            {{ produto.ativo ? 'Ativo' : 'Inativo' }}
-          </span>
-        </td>
-        <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-edit btn-small" (click)="editarProduto(produto.id!)">
-              Editar
-            </button>
-            <button class="btn btn-danger btn-small" (click)="excluirProduto(produto.id!)">
-              ✕
-            </button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table *ngIf="!loading && produtosFiltrados.length > 0" class="table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Produto</th>
+          <th style="width: 25%;">Categoria / Fornecedor</th>
+          <th style="width: 20%;">Qtd (mín)</th>
+          <th style="width: 10%;">Status</th>
+          <th style="width: 15%;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let produto of produtosFiltrados">
+          <td class="wrap-text">
+            <strong>{{ produto.nome }}</strong>
+            <div style="font-size: 11px; opacity: 0.7; margin-top: 2px;">{{ produto.id }}</div>
+          </td>
+          <td class="wrap-text">
+            <div style="font-size: 11px;">🏷️ {{ produto.categoria || '-' }}</div>
+            <div style="font-size: 11px; margin-top: 2px;">🏢 {{ produto.fornecedor?.nome || '-' }}</div>
+          </td>
+          <td>
+            <div style="font-size: 13px; font-weight: 600;">
+              {{ produto.quantidade_atual }} {{ produto.unidade_medida }}
+            </div>
+            <div style="font-size: 10px; opacity: 0.8; margin-top: 2px;">mín: {{ produto.quantidade_minima }}</div>
+          </td>
+          <td>
+            <div [ngClass]="(produto.ativo ?? false) ? 'badge-success' : 'badge-danger'"
+              style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;"></div>
+            <span>{{ (produto.ativo ?? false) ? 'Ativo' : 'Inativo' }}</span>
+          </td>
+          <td>
+            <div class="actions-container">
+              <button class="btn-action-standard btn-edit" (click)="editarProduto(produto.id!)" title="Editar">
+                📝
+              </button>
+              <button class="btn-action-standard btn-danger" (click)="excluirProduto(produto.id!)" title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-

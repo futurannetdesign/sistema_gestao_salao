@@ -21,6 +21,22 @@
   --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
 }
 
+/* Utilitários de Visibilidade */
+.desktop-only {
+  display: none !important;
+}
+
+@media (min-width: 1025px) {
+  .desktop-only {
+    display: inline-block !important;
+  }
+  
+  /* Se for block */
+  div.desktop-only, p.desktop-only, section.desktop-only {
+    display: block !important;
+  }
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--light-color);
@@ -29,9 +45,9 @@ body {
 }
 
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px 20px;
 }
 
 .btn {
@@ -88,6 +104,41 @@ body {
   color: var(--white);
 }
 
+/* Padrão de Botões de Ação em Tabelas */
+.btn-action-standard {
+  padding: 0;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: var(--white);
+}
+
+.btn-action-standard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  filter: brightness(1.1);
+}
+
+.btn-action-standard:active {
+  transform: translateY(0);
+}
+
+.actions-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+}
+
 .form-group {
   margin-bottom: 20px;
 }
@@ -128,25 +179,70 @@ body {
   background: var(--white);
   border-radius: 8px;
   overflow: hidden;
+  table-layout: fixed; /* Força o controle de largura por coluna */
 }
 
 .table th,
 .table td {
-  padding: 10px 12px;
+  padding: 8px 12px; /* Middle ground: comfortable padding */
   text-align: left;
   border-bottom: 1px solid var(--border-color);
-  font-size: 13px;
+  font-size: 13px; /* Slightly larger for readability */
+  color: var(--dark-color);
+  white-space: nowrap;
 }
 
 .table th {
   background-color: var(--primary-color);
   color: var(--white);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Permitir quebra de linha apenas em colunas específicas se necessário via classe */
+.table td.wrap-text {
+  white-space: normal;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .table tr:hover {
   background-color: #F9F9F9;
+}
+
+/* Tabela Responsiva - GLOBAL (Garante que nunca quebre o layout) */
+.table-responsive,
+.table-container {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--white);
+}
+
+/* Esconder scrollbar no Desktop para o design ficar limpo, mas manter funcionalidade */
+@media (min-width: 1025px) {
+  .table-responsive {
+    overflow-x: hidden; /* Evita barra arcaica no desktop */
+  }
+}
+
+/* Scrollbar visível nas tabelas responsivas para indicar que há mais conteúdo */
+.table-responsive::-webkit-scrollbar,
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 4px;
 }
 
 .alert {
@@ -280,7 +376,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   flex-wrap: wrap;
   gap: 15px;
 }
@@ -288,50 +384,77 @@ body {
 .page-header h1 {
   margin: 0;
   color: var(--primary-color);
-  font-size: 24px;
+  font-size: 1.5rem;
+  font-weight: 700;
   flex: 1;
   min-width: 200px;
-}
-
-.page-header .btn {
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .page-header .header-actions {
   display: flex;
   gap: 10px;
   align-items: center;
-  flex-wrap: wrap;
+  width: auto;
 }
 
-/* Botões pequenos para tabelas */
-.btn-small {
-  padding: 6px 12px;
-  font-size: 12px;
-  min-width: auto;
+@media (max-width: 600px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .page-header h1 {
+    font-size: 1.15rem; /* Ainda menor */
+    text-align: center;
+    width: 100%;
+  }
+  
+  .header-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    width: 100%; /* Botão "Novo" ocupa largura total no mobile */
+    justify-content: center;
+  }
+
+  /* Card padding reduzido no mobile */
+  .card {
+    padding: 12px;
+  }
+
+  .table-responsive {
+    overflow-x: auto; /* Reativa scroll no mobile */
+  }
+
+  .table {
+    min-width: 800px; /* Reduzido de 850px para caber melhor */
+  }
+
+  .search-input {
+    font-size: 16px !important; /* Evita zoom forçado no iOS Safari */
+  }
 }
 
-/* Ações em tabelas */
-.table td {
-  vertical-align: middle;
+/* Scrollbars elegantes */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.table .btn {
-  padding: 6px 12px;
-  font-size: 12px;
-  margin-right: 5px;
-  white-space: nowrap;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.table .btn:last-child {
-  margin-right: 0;
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 10px;
 }
 
-/* Badge de agendamento - mais discreto */
-.agendamento-ref {
-  font-size: 11px;
-  color: #666;
-  font-style: italic;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
 }
 

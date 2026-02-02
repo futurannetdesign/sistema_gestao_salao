@@ -201,38 +201,36 @@ export class UsuarioFormComponent implements OnInit {
       } else {
         // Criar novo usuário
         
-        // 1. Criar Auth User via Edge Function (Automatizado)
+        // 1. Criar Auth e DB User via Edge Function (Seguro e Privilegiado)
         try {
+          console.log("CHAMADA ÚNICA: Criando login e registro no banco...");
+          
+          // Capturar salao_id do usuário logado (Admin) para vincular o novo usuário
+          const adminData = this.authService.getUsuarioLogado();
+          
           const createResult = await this.passwordUpdateService.createUser(
             dados.email, 
             dados.senha, 
-            { nome: dados.nome, perfil: dados.perfil }
+            { 
+              nome: dados.nome, 
+              perfil: dados.perfil,
+              salao_id: (adminData as any)?.salao_id // Garantindo multi-tenancy
+            }
           );
 
           if (!createResult.success) {
+            console.error("FALHA NA CRIAÇÃO:", createResult.message);
             throw new Error(createResult.message);
           }
-
-          // 2. Criar registro na tabela usuarios (Se a Function já não tiver criado via Trigger, mas por segurança garantimos)
-          // Nota: Se você tiver um Trigger 'on auth.users insert -> public.usuarios insert', isso pode duplicar ou falhar.
-          // Assumindo que o sistema atual insere manual:
           
-          const dadosParaSalvar: any = {
-            nome: dados.nome,
-            email: dados.email,
-            perfil: dados.perfil,
-            ativo: dados.ativo !== false,
-            auth_id: createResult.data.user.id // Vinculando o ID do Auth ao registro local
-          };
-
-          await this.supabase.insert('usuarios', dadosParaSalvar);
-          
-          this.mostrarPopupSucesso('Usuário criado com sucesso! Login liberado.');
+          console.log("SUCESSO TOTAL: Usuário completo criado.");
+          this.mostrarPopupSucesso('Usuário criado com sucesso! Login e perfil configurados.');
           
         } catch (err: any) {
-          console.error('Erro ao criar usuário automático:', err);
-          this.showAlert('Erro ao criar login automático: ' + err.message, 'danger');
-          return; // Para não sair da tela
+          console.error('ERRO NO FLUXO DE CRIAÇÃO:', err);
+          this.showAlert('Erro ao criar usuário: ' + err.message, 'danger');
+          this.loading = false;
+          return; 
         }
       }
 
@@ -241,7 +239,8 @@ export class UsuarioFormComponent implements OnInit {
       }, 2000);
     } catch (error: any) {
       this.showAlert('Erro ao salvar usuário: ' + error.message, 'danger');
-      this.loading = false;
+    } finally {
+      this.loading = false; // <<< GARANTE QUE SEMPRE DESTRAVA AO FINAL
     }
   }
 

@@ -43,12 +43,18 @@ export class AuthService {
           email: email,
           nome: authData.user.email?.split('@')[0] || 'Usuário',
           perfil: 'funcionario',
-          ativo: true
+          ativo: true,
+          auth_id: authData.user.id
         }) as Usuario;
         
         this.usuarioLogado = novoUsuario;
       } else {
         const usuario = usuarios[0];
+
+        // Se o registro existe mas não tem auth_id, vincular agora por segurança
+        if (!usuario.auth_id) {
+          await this.supabase.update('usuarios', usuario.id!, { auth_id: authData.user.id });
+        }
 
         // Verificar se o usuário está ativo
         if (!usuario.ativo) {
@@ -61,7 +67,9 @@ export class AuthService {
           nome: usuario.nome,
           email: usuario.email,
           perfil: usuario.perfil,
-          ativo: usuario.ativo
+          ativo: usuario.ativo,
+          auth_id: authData.user.id,
+          salao_id: (usuario as any).salao_id
         };
       }
 

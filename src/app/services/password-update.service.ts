@@ -13,10 +13,16 @@ export class PasswordUpdateService {
    */
   async callAdminFunction(payload: any): Promise<{ success: boolean; message: string; data?: any }> {
     try {
-      // Acessa o client do SupabaseService via o getter 'client'
-      const { data, error } = await this.supabase.client.functions.invoke('admin-user-ops', {
+      // Timeout de 15 segundos para evitar travamento eterno
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Tempo limite da requisição excedido (15s)')), 15000)
+      );
+
+      const invokePromise = this.supabase.client.functions.invoke('admin-user-ops', {
         body: payload
       });
+
+      const { data, error }: any = await Promise.race([invokePromise, timeoutPromise]);
 
       if (error) throw error;
       

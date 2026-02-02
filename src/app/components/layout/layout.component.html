@@ -1,18 +1,18 @@
 <div class="layout-container">
   <header class="header">
     <div class="header-content">
-      <button class="menu-toggle" (click)="toggleMenu()">
+      <button class="menu-toggle" (click)="toggleMenu()" aria-label="Abrir Menu">
         <span>☰</span>
       </button>
-      
+
       <div class="logo-container">
         <div class="logo-wrapper">
           <img *ngIf="logoUrl" [src]="logoUrl" alt="Logo" class="logo-image" />
           <h1 *ngIf="!logoUrl" class="logo-text">{{ nomeSalao }}</h1>
         </div>
       </div>
-      
-      <div class="header-info">
+
+      <div class="header-info desktop-only">
         <div class="data-hora">
           <span class="dia-semana">{{ diaSemana }}</span>
           <span class="separador">|</span>
@@ -21,22 +21,26 @@
           <span class="hora">{{ horaFormatada }}</span>
         </div>
       </div>
-      
+
       <nav class="header-nav">
         <div class="user-info" *ngIf="usuarioLogado">
-          <span class="user-name">{{ usuarioLogado.nome }}</span>
-          <span class="user-profile" [class.admin]="usuarioLogado.perfil === 'admin'">
-            {{ usuarioLogado.perfil === 'admin' ? '👑 Admin' : '👤 Funcionário' }}
+          <span class="user-name desktop-only">{{ usuarioLogado.nome }}</span>
+          <span class="user-profile" [class.admin]="usuarioLogado.perfil === 'admin'"
+            [class.gerente]="usuarioLogado.perfil === 'gerente'">
+            {{ usuarioLogado.perfil === 'admin' ? '👑' : (usuarioLogado.perfil === 'gerente' ? '👔' : '👤') }}
+            <span class="profile-label desktop-only">{{ usuarioLogado.perfil === 'admin' ? 'Admin' :
+              (usuarioLogado.perfil === 'gerente' ? 'Gerente' : 'Funcionário') }}</span>
           </span>
         </div>
-        <button class="btn btn-danger btn-small" (click)="logout()" title="Sair">
-          🚪 Sair
+        <button class="btn-logout-mobile" (click)="logout()" title="Sair">
+          🚪 <span class="desktop-only text-white ml-1">Sair</span>
         </button>
       </nav>
     </div>
   </header>
 
   <div class="main-container">
+    <div class="sidebar-backdrop" *ngIf="menuOpen" (click)="toggleMenu()"></div>
     <aside class="sidebar" [class.open]="menuOpen">
       <nav class="sidebar-nav">
         <a routerLink="/dashboard" routerLinkActive="active" (click)="menuOpen = false">
@@ -48,7 +52,8 @@
         <a *ngIf="podeVerServicos" routerLink="/servicos" routerLinkActive="active" (click)="menuOpen = false">
           <span>✂️</span> Serviços
         </a>
-        <a *ngIf="podeVerProfissionais" routerLink="/profissionais" routerLinkActive="active" (click)="menuOpen = false">
+        <a *ngIf="podeVerProfissionais" routerLink="/profissionais" routerLinkActive="active"
+          (click)="menuOpen = false">
           <span>👨‍💼</span> Profissionais
         </a>
         <a *ngIf="podeVerAgendamentos" routerLink="/agendamentos" routerLinkActive="active" (click)="menuOpen = false">
@@ -56,10 +61,12 @@
         </a>
         <div class="nav-section" *ngIf="podeVerContasReceber || podeVerContasPagar || podeVerCaixa">
           <span class="nav-section-title">💰 Financeiro</span>
-          <a *ngIf="podeVerContasReceber" routerLink="/financeiro/contas-receber" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerContasReceber" routerLink="/financeiro/contas-receber" routerLinkActive="active"
+            (click)="menuOpen = false">
             <span>📥</span> Contas a Receber
           </a>
-          <a *ngIf="podeVerContasPagar" routerLink="/financeiro/contas-pagar" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerContasPagar" routerLink="/financeiro/contas-pagar" routerLinkActive="active"
+            (click)="menuOpen = false">
             <span>📤</span> Contas a Pagar
           </a>
           <a *ngIf="podeVerCaixa" routerLink="/financeiro/caixa" routerLinkActive="active" (click)="menuOpen = false">
@@ -71,7 +78,8 @@
           <a *ngIf="podeVerEstoque" routerLink="/estoque" routerLinkActive="active" (click)="menuOpen = false">
             <span>📦</span> Produtos
           </a>
-          <a *ngIf="podeVerFornecedores" routerLink="/fornecedores" routerLinkActive="active" (click)="menuOpen = false">
+          <a *ngIf="podeVerFornecedores" routerLink="/fornecedores" routerLinkActive="active"
+            (click)="menuOpen = false">
             <span>🏢</span> Fornecedores
           </a>
         </div>
@@ -101,4 +109,3 @@
     </main>
   </div>
 </div>
-

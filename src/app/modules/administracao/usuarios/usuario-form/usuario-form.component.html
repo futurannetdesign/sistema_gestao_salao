@@ -40,27 +40,20 @@
     <div class="form-row">
       <div class="form-group">
         <label>
-          {{ usuarioId ? 'Nova Senha' : 'Senha' }} 
+          {{ usuarioId ? 'Nova Senha' : 'Senha' }}
           <span *ngIf="!usuarioId">*</span>
           <small *ngIf="usuarioId" style="color: #666; font-size: 12px;">
             (deixe em branco para manter a senha atual)
             <br>
-            <strong style="color: #ff9800;">⚠️ Atenção:</strong> Ao alterar a senha, será enviado um email de recuperação para o usuário. Ou altere manualmente no Supabase Dashboard.
+            <strong style="color: #ff9800;">⚠️ Atenção:</strong> Ao alterar a senha, será enviado um email de
+            recuperação para o usuário. Ou altere manualmente no Supabase Dashboard.
           </small>
         </label>
         <div style="position: relative;">
-          <input 
-            [type]="mostrarSenha ? 'text' : 'password'" 
-            formControlName="senha" 
-            class="form-control" 
-            [placeholder]="usuarioId ? 'Deixe em branco para manter' : 'Mínimo 6 caracteres'"
-          />
-          <button 
-            type="button" 
-            class="btn-toggle-password" 
-            (click)="mostrarSenha = !mostrarSenha"
-            title="{{ mostrarSenha ? 'Ocultar' : 'Mostrar' }} senha"
-          >
+          <input [type]="mostrarSenha ? 'text' : 'password'" formControlName="senha" class="form-control"
+            [placeholder]="usuarioId ? 'Deixe em branco para manter' : 'Mínimo 6 caracteres'" />
+          <button type="button" class="btn-toggle-password" (click)="mostrarSenha = !mostrarSenha"
+            title="{{ mostrarSenha ? 'Ocultar' : 'Mostrar' }} senha">
             {{ mostrarSenha ? '👁️' : '👁️‍🗨️' }}
           </button>
         </div>
@@ -71,14 +64,12 @@
       </div>
       <div class="form-group">
         <label>Confirmar Senha <span *ngIf="!usuarioId">*</span></label>
-        <input 
-          [type]="mostrarSenha ? 'text' : 'password'" 
-          formControlName="confirmarSenha" 
-          class="form-control" 
-          placeholder="Digite a senha novamente"
-        />
-        <span *ngIf="usuarioForm.get('confirmarSenha')?.invalid && usuarioForm.get('confirmarSenha')?.touched" class="error-message">
-          <span *ngIf="usuarioForm.get('confirmarSenha')?.errors?.['required']">Confirmação de senha é obrigatória</span>
+        <input [type]="mostrarSenha ? 'text' : 'password'" formControlName="confirmarSenha" class="form-control"
+          placeholder="Digite a senha novamente" />
+        <span *ngIf="usuarioForm.get('confirmarSenha')?.invalid && usuarioForm.get('confirmarSenha')?.touched"
+          class="error-message">
+          <span *ngIf="usuarioForm.get('confirmarSenha')?.errors?.['required']">Confirmação de senha é
+            obrigatória</span>
           <span *ngIf="usuarioForm.get('confirmarSenha')?.errors?.['mismatch']">As senhas não coincidem</span>
         </span>
       </div>
@@ -98,7 +89,7 @@
       </button>
       <button type="submit" class="btn btn-primary" [disabled]="loading || usuarioForm.invalid">
         <span *ngIf="!loading">{{ usuarioId ? 'Atualizar' : 'Criar' }} Usuário</span>
-        <span *ngIf="loading">Salvando...</span>
+        <span *ngIf="loading">Processando v2.0...</span>
       </button>
     </div>
   </form>
@@ -110,8 +101,8 @@
     <div class="success-popup-icon">✅</div>
     <h2>{{ successMessage }}</h2>
     <p *ngIf="usuarioId && usuarioForm.get('senha')?.value">A senha do usuário foi alterada com sucesso.</p>
-    <p *ngIf="usuarioId && usuarioForm.get('senha')?.value"><strong>Importante:</strong> O usuário precisará usar a nova senha no próximo login.</p>
+    <p *ngIf="usuarioId && usuarioForm.get('senha')?.value"><strong>Importante:</strong> O usuário precisará usar a nova
+      senha no próximo login.</p>
     <button class="btn btn-primary" (click)="fecharPopupSucesso()">OK</button>
   </div>
 </div>
-

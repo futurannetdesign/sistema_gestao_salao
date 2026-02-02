@@ -90,6 +90,7 @@ CREATE POLICY "Admin edita configs" ON configuracoes FOR ALL TO authenticated US
 
 -- --- TABELA: PERMISSOES (Tabela auxiliar da UI) ---
 CREATE POLICY "Staff lê permissões" ON permissoes FOR SELECT TO authenticated USING (is_staff());
+CREATE POLICY "Admin gerencia permissões" ON permissoes FOR ALL TO authenticated USING (is_admin());
 
 -- 5. ⚡ TRIGGER PARA AUTO-VINCULAR USER (Opcional mas recomendado)
 -- Atualiza a tabela public.usuarios com o auth.uid() quando o email bate

@@ -9,13 +9,8 @@
 
 <div class="card">
   <div class="filters-bar">
-    <input
-      type="text"
-      placeholder="Buscar por nome ou categoria..."
-      [(ngModel)]="searchTerm"
-      (input)="filtrarServicos()"
-      class="search-input"
-    />
+    <input type="text" placeholder="Buscar por nome ou categoria..." [(ngModel)]="searchTerm"
+      (input)="filtrarServicos()" class="search-input" />
     <select [(ngModel)]="categoriaFiltro" (change)="filtrarServicos()" class="filter-select">
       <option value="">Todas as categorias</option>
       <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
@@ -30,40 +25,43 @@
     <p>Nenhum serviço encontrado.</p>
   </div>
 
-  <table *ngIf="!loading && servicosFiltrados.length > 0" class="table">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Categoria</th>
-        <th>Valor Padrão</th>
-        <th>Duração (min)</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let servico of servicosFiltrados">
-        <td>{{ servico.nome }}</td>
-        <td>{{ servico.categoria }}</td>
-        <td>{{ formatarMoeda(servico.valor_padrao) }}</td>
-        <td>{{ servico.duracao_estimada }}</td>
-        <td>
-          <span class="badge" [class.badge-success]="servico.ativo" [class.badge-danger]="!servico.ativo">
-            {{ servico.ativo ? 'Ativo' : 'Inativo' }}
-          </span>
-        </td>
-        <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-            <button *ngIf="podeEditar" class="btn btn-edit btn-small" (click)="editarServico(servico.id!)">
-              Editar
-            </button>
-            <button *ngIf="podeExcluir" class="btn btn-danger btn-small" (click)="excluirServico(servico.id!)">
-              ✕
-            </button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table *ngIf="!loading && servicosFiltrados.length > 0" class="table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Nome do Serviço</th>
+          <th style="width: 20%;">Categoria</th>
+          <th style="width: 15%;">Valor</th>
+          <th style="width: 15%;">Duração</th>
+          <th style="width: 10%;">Status</th>
+          <th style="width: 10%;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let servico of servicosFiltrados">
+          <td class="wrap-text"><strong>{{ servico.nome }}</strong></td>
+          <td>{{ servico.categoria }}</td>
+          <td style="font-weight: 600;">{{ formatarMoeda(servico.valor_padrao) }}</td>
+          <td>{{ servico.duracao_estimada }} min</td>
+          <td>
+            <div [ngClass]="servico.ativo ? 'badge-success' : 'badge-danger'"
+              style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;"></div>
+            <span>{{ servico.ativo ? 'Ativo' : 'Inativo' }}</span>
+          </td>
+          <td>
+            <div class="actions-container">
+              <button *ngIf="podeEditar" class="btn-action-standard btn-edit" (click)="editarServico(servico.id!)"
+                title="Editar">
+                📝
+              </button>
+              <button *ngIf="podeExcluir" class="btn-action-standard btn-danger" (click)="excluirServico(servico.id!)"
+                title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-

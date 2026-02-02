@@ -8,27 +8,26 @@ const corsHeaders = {
 };
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
+  console.log("--- Nova Requisição Recebida ---");
+  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    // 1. Criar cliente Supabase com PRIVILÉGIOS DE ADMIN
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // 2. Ler dados da requisição
     const body = await req.json();
     const { action, email, password, userId, userData } = body;
+    console.log(`Ação: ${action} | Email: ${email}`);
 
-    // 3. Roteamento de Ações
     let data, error;
 
-    // AÇÃO: CRIAR USUÁRIO NOVO
     if (action === 'create_user') {
+      console.log("Iniciando criação no Auth...");
       if (!email || !password) throw new Error("Email e Senha são obrigatórios para criação.");
       
       const { data: user, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -37,16 +36,46 @@ serve(async (req: Request) => {
         email_confirm: true,
         user_metadata: userData
       });
-      data = user;
-      error = createError;
+
+      if (createError) {
+        console.error("Erro ao criar Auth User:", createError);
+        throw createError;
+      }
+
+      console.log("SUCESSO: Auth User criado:", user.user.id);
+
+      // Inserir na tabela public.usuarios (Admin bypass RLS)
+      console.log("Iniciando inserção na tabela public.usuarios...");
+      const { data: dbUser, error: dbError } = await supabaseAdmin
+        .from('usuarios')
+        .insert([{
+          auth_id: user.user.id,
+          email: email,
+          nome: userData?.nome || 'Usuário',
+          perfil: userData?.perfil || 'funcionario',
+          ativo: true,
+          salao_id: userData?.salao_id
+        }])
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error("Erro ao criar registro no banco:", dbError);
+        throw new Error(`Auth criado, mas erro no banco: ${dbError.message}`);
+      }
+
+      console.log("SUCESSO: Registro no banco criado.");
+      data = { user: user.user, dbUser };
+      error = null;
     } 
     
-    // AÇÃO: ATUALIZAR SENHA
     else if (action === 'update_password') {
+      console.log("Iniciando atualização de senha...");
       if (!password) throw new Error("Nova senha é obrigatória.");
       
       let targetUserId = userId;
       if (!targetUserId && email) {
+        console.log("Buscando ID por email...");
         const { data: listUsers } = await supabaseAdmin.auth.admin.listUsers();
         const found = listUsers.users.find((u: any) => u.email === email);
         if (found) targetUserId = found.id;
@@ -62,8 +91,8 @@ serve(async (req: Request) => {
       error = updateError;
     } 
     
-    // AÇÃO: DELETAR USUÁRIO
     else if (action === 'delete_user') {
+        console.log("Iniciando exclusão de usuário...");
         let targetUserId = userId;
         if (!targetUserId && email) {
             const { data: listUsers } = await supabaseAdmin.auth.admin.listUsers();
@@ -72,6 +101,7 @@ serve(async (req: Request) => {
         }
 
         if (!targetUserId) {
+            console.log("Usuário não encontrado no Auth.");
             return new Response(JSON.stringify({ success: true, message: "Usuário não existia no Auth." }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 200,
@@ -86,17 +116,22 @@ serve(async (req: Request) => {
     }
     
     else {
-      throw new Error("Ação inválida. Use 'create_user' ou 'update_password'.");
+      throw new Error("Ação inválida.");
     }
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erro interno do Supabase Admin:", error);
+      throw error;
+    }
 
+    console.log("Operação finalizada com sucesso.");
     return new Response(JSON.stringify({ success: true, data }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
 
   } catch (err: any) {
+    console.error("DEBUG - Erro Capturado na Edge Function:", err.message);
     return new Response(JSON.stringify({ success: false, error: err.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,

@@ -9,13 +9,8 @@
 
 <div class="card">
   <div class="search-bar">
-    <input
-      type="text"
-      placeholder="Buscar por nome ou celular..."
-      [(ngModel)]="searchTerm"
-      (input)="filtrarClientes()"
-      class="search-input"
-    />
+    <input type="text" placeholder="Buscar por nome ou celular..." [(ngModel)]="searchTerm" (input)="filtrarClientes()"
+      class="search-input" />
   </div>
 
   <div *ngIf="loading" class="loading">
@@ -26,68 +21,54 @@
     <p>Nenhum cliente encontrado.</p>
   </div>
 
-  <table *ngIf="!loading && clientesFiltrados.length > 0" class="table">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Celular</th>
-        <th>WhatsApp</th>
-        <th>Sexo</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let cliente of clientesFiltrados">
-        <td>{{ cliente.nome }}</td>
-        <td>{{ formatarTelefone(cliente.celular) }}</td>
-        <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-            <span>{{ formatarTelefone(cliente.whatsapp) }}</span>
-            <div class="whatsapp-actions" *ngIf="cliente.whatsapp || cliente.celular">
-              <button 
-                class="btn btn-success btn-small" 
-                (click)="abrirWhatsApp(cliente)"
-                title="Abrir WhatsApp"
-              >
-                💬 WhatsApp
+  <div class="table-responsive">
+    <table *ngIf="!loading && clientesFiltrados.length > 0" class="table">
+      <thead>
+        <tr>
+          <th style="width: 35%;">Nome do Cliente</th>
+          <th style="width: 20%;">Contato</th>
+          <th style="width: 25%;">WhatsApp / Ações Rápidas</th>
+          <th style="width: 10%;">Gênero</th>
+          <th style="width: 10%;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientesFiltrados">
+          <td class="wrap-text"><strong>{{ cliente.nome }}</strong></td>
+          <td>
+            <div style="font-size: 11px;">📱 {{ formatarTelefone(cliente.celular) }}</div>
+            <div *ngIf="cliente.whatsapp" style="font-size: 11px; margin-top: 2px; opacity: 0.8;">💬 {{
+              formatarTelefone(cliente.whatsapp) }}</div>
+          </td>
+          <td>
+            <div class="actions-container" *ngIf="cliente.whatsapp || cliente.celular">
+              <button class="btn-action-standard btn-success" (click)="abrirWhatsApp(cliente)" title="WhatsApp">
+                💬
               </button>
-              <button 
-                class="btn btn-primary btn-small" 
-                (click)="enviarPromocao(cliente)"
-                title="Enviar Promoção"
-              >
-                🎉 Promoção
+              <button class="btn-action-standard btn-primary" (click)="enviarPromocao(cliente)" title="Promoção">
+                🎉
               </button>
-              <button 
-                class="btn btn-warning btn-small" 
-                (click)="enviarBoleto(cliente)"
-                title="Enviar Boleto/Conta a Receber"
-              >
-                💰 Boleto
-              </button>
-              <button 
-                class="btn btn-info btn-small" 
-                (click)="enviarOrdemServico(cliente)"
-                title="Enviar Ordem de Serviço"
-              >
-                📄 OS
+              <button class="btn-action-standard btn-warning" (click)="enviarBoleto(cliente)"
+                title="Lembrete de Cobrança">
+                💰
               </button>
             </div>
-          </div>
-        </td>
-        <td>{{ cliente.sexo || '-' }}</td>
-        <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-            <button *ngIf="podeEditar" class="btn btn-edit btn-small" (click)="editarCliente(cliente.id!)">
-              Editar
-            </button>
-            <button *ngIf="podeExcluir" class="btn btn-danger btn-small" (click)="excluirCliente(cliente.id!)">
-              ✕
-            </button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          </td>
+          <td style="font-size: 11px;">{{ cliente.sexo || '-' }}</td>
+          <td>
+            <div class="actions-container">
+              <button *ngIf="podeEditar" class="btn-action-standard btn-edit" (click)="editarCliente(cliente.id!)"
+                title="Editar">
+                📝
+              </button>
+              <button *ngIf="podeExcluir" class="btn-action-standard btn-danger" (click)="excluirCliente(cliente.id!)"
+                title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-

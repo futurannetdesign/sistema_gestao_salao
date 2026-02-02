@@ -363,6 +363,23 @@ export class CaixaComponent implements OnInit {
     return '';
   }
 
+  async excluirMovimentacao(id: number) {
+    if (!confirm('Tem certeza que deseja excluir esta movimentação?')) {
+      return;
+    }
+
+    try {
+      this.loading = true;
+      await this.supabase.delete('movimentacoes_caixa', id);
+      this.showAlert('Movimentação excluída com sucesso!', 'success');
+      await this.carregarMovimentacoes();
+      this.loading = false;
+    } catch (error: any) {
+      this.showAlert('Erro ao excluir movimentação: ' + error.message, 'danger');
+      this.loading = false;
+    }
+  }
+
   showAlert(message: string, type: string) {
     this.alertMessage = message;
     this.alertType = type;

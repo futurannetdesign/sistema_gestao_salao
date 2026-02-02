@@ -9,13 +9,8 @@
 
 <div class="card">
   <div class="search-bar">
-    <input
-      type="text"
-      placeholder="Buscar por nome, celular, e-mail ou especialidade..."
-      [(ngModel)]="searchTerm"
-      (input)="filtrarProfissionais()"
-      class="search-input"
-    />
+    <input type="text" placeholder="Buscar por nome, celular, e-mail ou especialidade..." [(ngModel)]="searchTerm"
+      (input)="filtrarProfissionais()" class="search-input" />
   </div>
 
   <div *ngIf="loading" class="loading">
@@ -26,40 +21,48 @@
     <p>Nenhum profissional encontrado.</p>
   </div>
 
-  <table *ngIf="!loading && profissionaisFiltrados.length > 0" class="table">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Celular</th>
-        <th>E-mail</th>
-        <th>Especialidades</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let profissional of profissionaisFiltrados">
-        <td>{{ profissional.nome }}</td>
-        <td>{{ formatarTelefone(profissional.celular) }}</td>
-        <td>{{ profissional.email || '-' }}</td>
-        <td>{{ formatarEspecialidades(profissional.especialidades) }}</td>
-        <td>
-          <span class="badge" [class.badge-success]="profissional.ativo" [class.badge-danger]="!profissional.ativo">
-            {{ profissional.ativo ? 'Ativo' : 'Inativo' }}
-          </span>
-        </td>
-        <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-edit btn-small" (click)="editarProfissional(profissional.id!)">
-              Editar
-            </button>
-            <button class="btn btn-danger btn-small" (click)="excluirProfissional(profissional.id!)">
-              ✕
-            </button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table *ngIf="!loading && profissionaisFiltrados.length > 0" class="table">
+      <thead>
+        <tr>
+          <th style="width: 30%;">Profissional</th>
+          <th style="width: 15%;">Celular</th>
+          <th style="width: 35%;">Especialidades e Contato</th>
+          <th style="width: 10%;">Status</th>
+          <th style="width: 10%;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let profissional of profissionaisFiltrados">
+          <td class="wrap-text"><strong>{{ profissional.nome }}</strong></td>
+          <td style="font-size: 11px;">{{ formatarTelefone(profissional.celular) }}</td>
+          <td>
+            <div class="wrap-text" style="font-size: 11px; font-weight: 500; color: var(--primary-color);">
+              {{ formatarEspecialidades(profissional.especialidades) }}
+            </div>
+            <div *ngIf="profissional.email" style="font-size: 10px; opacity: 0.8; margin-top: 2px;">
+              ✉️ {{ profissional.email }}
+            </div>
+          </td>
+          <td>
+            <div [ngClass]="profissional.ativo ? 'badge-success' : 'badge-danger'"
+              style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;"></div>
+            <span>{{ profissional.ativo ? 'Ativo' : 'Inativo' }}</span>
+          </td>
+          <td>
+            <div class="actions-container">
+              <button class="btn-action-standard btn-edit" (click)="editarProfissional(profissional.id!)"
+                title="Editar">
+                📝
+              </button>
+              <button class="btn-action-standard btn-danger" (click)="excluirProfissional(profissional.id!)"
+                title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-

@@ -28,13 +28,8 @@
 
 <div class="card">
   <div class="filters-bar">
-    <input
-      type="text"
-      placeholder="Buscar por descrição..."
-      [(ngModel)]="searchTerm"
-      (input)="filtrarContas()"
-      class="search-input"
-    />
+    <input type="text" placeholder="Buscar por descrição..." [(ngModel)]="searchTerm" (input)="filtrarContas()"
+      class="search-input" />
     <select [(ngModel)]="statusFiltro" (change)="filtrarContas()" class="filter-select">
       <option value="">Todos os status</option>
       <option value="pendente">Pendente</option>
@@ -61,60 +56,56 @@
     <p>Nenhuma conta encontrada.</p>
   </div>
 
-  <table *ngIf="!loading && contasFiltradas.length > 0" class="table">
-    <thead>
-      <tr>
-        <th>Descrição</th>
-        <th>Categoria</th>
-        <th>Valor</th>
-        <th>Vencimento</th>
-        <th>Pagamento</th>
-        <th>Forma Pagamento</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let conta of contasFiltradas">
-        <td>{{ conta.descricao }}</td>
-        <td>{{ conta.categoria }}</td>
-        <td>{{ formatarMoeda(conta.valor) }}</td>
-        <td>{{ formatarData(conta.data_vencimento) }}</td>
-        <td>{{ conta.data_pagamento ? formatarData(conta.data_pagamento) : '-' }}</td>
-        <td>{{ conta.forma_pagamento || '-' }}</td>
-        <td>
-          <span class="badge" [ngClass]="getStatusBadgeClass(conta.status)">
-            {{ getStatusLabel(conta.status) }}
-          </span>
-        </td>
-        <td>
-          <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-            <button 
-              class="btn btn-edit btn-small" 
-              (click)="editarConta(conta.id!)"
-              title="Editar conta"
-            >
-              ✏️ Editar
-            </button>
-            <button 
-              *ngIf="conta.status !== 'pago'" 
-              class="btn btn-success btn-small" 
-              (click)="marcarComoPago(conta.id!)"
-              title="Marcar como pago"
-            >
-              ✓ Pago
-            </button>
-            <button 
-              class="btn btn-danger btn-small" 
-              (click)="excluirConta(conta.id!)"
-              title="Excluir conta"
-            >
-              ✕
-            </button>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table *ngIf="!loading && contasFiltradas.length > 0" class="table">
+      <thead>
+        <tr>
+          <th style="width: 25%;">Descrição</th>
+          <th style="width: 15%;">Categoria</th>
+          <th style="width: 15%;">Valor</th>
+          <th style="width: 15%;">Vencimento</th>
+          <th style="width: 10%;">Pagamento</th>
+          <th style="width: 10%;">Status</th>
+          <th style="width: 10%;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let conta of contasFiltradas">
+          <td class="wrap-text"><strong>{{ conta.descricao }}</strong></td>
+          <td>{{ conta.categoria }}</td>
+          <td style="font-weight: 700; font-size: 14px; color: var(--danger-color);">
+            -{{ formatarMoeda(conta.valor) }}
+          </td>
+          <td>
+            <div style="font-size: 11px; font-weight: 500;">📅 {{ formatarData(conta.data_vencimento) }}</div>
+          </td>
+          <td style="font-size: 11px;">
+            {{ conta.data_pagamento ? formatarData(conta.data_pagamento) : '-' }}
+            <div *ngIf="conta.forma_pagamento" style="font-size: 9px; opacity: 0.7;">💳 {{ conta.forma_pagamento }}
+            </div>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getStatusBadgeClass(conta.status)"
+              style="padding: 2px 8px; font-size: 10px; text-transform: uppercase;">
+              {{ getStatusLabel(conta.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="actions-container">
+              <button class="btn-action-standard btn-edit" (click)="editarConta(conta.id!)" title="Editar">
+                📝
+              </button>
+              <button *ngIf="conta.status !== 'pago'" class="btn-action-standard btn-success"
+                (click)="marcarComoPago(conta.id!)" title="Marcar como Pago">
+                ✓
+              </button>
+              <button class="btn-action-standard btn-danger" (click)="excluirConta(conta.id!)" title="Excluir">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
-

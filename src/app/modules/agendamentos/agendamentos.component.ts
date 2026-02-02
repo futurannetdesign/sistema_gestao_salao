@@ -269,6 +269,15 @@ export class AgendamentosComponent implements OnInit {
     }
   }
 
+  formatarDataHoraCurta(dataHora: string): string {
+    const data = new Date(dataHora);
+    const dia = data.getDate().toString().padStart(2, '0');
+    const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+    const horas = data.getHours().toString().padStart(2, '0');
+    const minutos = data.getMinutes().toString().padStart(2, '0');
+    return `${dia}/${mes} ${horas}:${minutos}`;
+  }
+
   formatarDataHora(dataHora: string): string {
     const data = new Date(dataHora);
     return data.toLocaleString('pt-BR');
