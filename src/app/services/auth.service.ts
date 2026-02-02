@@ -121,6 +121,14 @@ export class AuthService {
     return this.usuarioLogado?.perfil === 'admin';
   }
 
+  isGerente(): boolean {
+    return this.usuarioLogado?.perfil === 'gerente';
+  }
+
+  isGerenteOrAdmin(): boolean {
+    return this.isAdmin() || this.isGerente();
+  }
+
   isFuncionario(): boolean {
     return this.usuarioLogado?.perfil === 'funcionario';
   }

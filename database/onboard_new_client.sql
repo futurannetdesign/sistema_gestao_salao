@@ -34,6 +34,19 @@ BEGIN
     VALUES (p_nome_dono, p_email_dono, 'admin', true, v_salao_id)
     RETURNING id INTO v_usuario_id;
 
+    -- 3. Clonar Permissões Padrão para o novo Salão
+    -- Busca todos os registros onde salao_id é NULL e replica para o novo salao_id
+    INSERT INTO public.permissoes (perfil, modulo, acao, permitido, salao_id)
+    SELECT perfil, modulo, acao, permitido, v_salao_id
+    FROM public.permissoes
+    WHERE salao_id IS NULL;
+
+    -- 4. Criar Configurações Básicas para o novo Salão
+    INSERT INTO public.configuracoes (chave, valor, salao_id)
+    VALUES 
+        ('nome_salao', p_nome_salao, v_salao_id),
+        ('limite_usuarios', CASE WHEN p_plano = 'free' THEN '3' ELSE '20' END, v_salao_id);
+
     -- Retornar os IDs gerados para confirmação
     RETURN QUERY SELECT 
         v_salao_id, 

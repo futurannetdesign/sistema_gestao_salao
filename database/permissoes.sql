@@ -1,15 +1,16 @@
 -- Tabela de Permissões por Perfil
 -- Define quais ações cada perfil pode realizar
 
-create table permissoes (
+create table public.permissoes (
   id bigint generated always as identity primary key,
-  perfil text not null, -- 'admin' ou 'funcionario'
+  perfil text not null, -- 'admin', 'gerente' ou 'funcionario'
   modulo text not null, -- 'clientes', 'servicos', 'agendamentos', etc.
   acao text not null, -- 'visualizar', 'criar', 'editar', 'excluir', 'marcar_pago', 'sincronizar'
   permitido boolean default true,
+  salao_id uuid REFERENCES public.saloes(id), -- Multi-tenancy
   created_at timestamp default now(),
   updated_at timestamp default now(),
-  unique(perfil, modulo, acao)
+  unique(salao_id, perfil, modulo, acao)
 );
 
 -- Índices para melhor performance
@@ -128,4 +129,60 @@ INSERT INTO permissoes (perfil, modulo, acao, permitido) VALUES
 ('funcionario', 'configuracoes', 'editar', false),
 -- Auditoria (não permitido para funcionários)
 ('funcionario', 'auditoria', 'visualizar', false);
+
+-- Permissões padrão para GERENTE (Intermediário)
+INSERT INTO public.permissoes (perfil, modulo, acao, permitido) VALUES
+-- Dashboard
+('gerente', 'dashboard', 'visualizar', true),
+-- Clientes
+('gerente', 'clientes', 'visualizar', true),
+('gerente', 'clientes', 'criar', true),
+('gerente', 'clientes', 'editar', true),
+('gerente', 'clientes', 'excluir', false),
+-- Serviços
+('gerente', 'servicos', 'visualizar', true),
+('gerente', 'servicos', 'criar', true),
+('gerente', 'servicos', 'editar', true),
+('gerente', 'servicos', 'excluir', false),
+-- Profissionais
+('gerente', 'profissionais', 'visualizar', true),
+('gerente', 'profissionais', 'criar', true),
+('gerente', 'profissionais', 'editar', true),
+('gerente', 'profissionais', 'excluir', false),
+-- Agendamentos
+('gerente', 'agendamentos', 'visualizar', true),
+('gerente', 'agendamentos', 'criar', true),
+('gerente', 'agendamentos', 'editar', true),
+('gerente', 'agendamentos', 'excluir', true),
+-- Contas a Receber
+('gerente', 'contas_receber', 'visualizar', true),
+('gerente', 'contas_receber', 'criar', true),
+('gerente', 'contas_receber', 'editar', true),
+('gerente', 'contas_receber', 'excluir', false),
+('gerente', 'contas_receber', 'marcar_pago', true),
+('gerente', 'contas_receber', 'sincronizar', true),
+-- Contas a Pagar
+('gerente', 'contas_pagar', 'visualizar', true),
+('gerente', 'contas_pagar', 'criar', true),
+('gerente', 'contas_pagar', 'editar', true),
+('gerente', 'contas_pagar', 'excluir', false),
+('gerente', 'contas_pagar', 'marcar_pago', true),
+-- Caixa
+('gerente', 'caixa', 'visualizar', true),
+('gerente', 'caixa', 'sincronizar', true),
+-- Estoque
+('gerente', 'estoque', 'visualizar', true),
+('gerente', 'estoque', 'criar', true),
+('gerente', 'estoque', 'editar', true),
+('gerente', 'estoque', 'excluir', false),
+-- Fornecedores
+('gerente', 'fornecedores', 'visualizar', true),
+('gerente', 'fornecedores', 'criar', true),
+('gerente', 'fornecedores', 'editar', true),
+('gerente', 'fornecedores', 'excluir', false),
+-- Configurações (gerente pode ver mas não editar)
+('gerente', 'configuracoes', 'visualizar', true),
+('gerente', 'configuracoes', 'editar', false),
+-- Auditoria (apenas admin)
+('gerente', 'auditoria', 'visualizar', false);
 

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
 import { AuthService } from '../../../services/auth.service';
+import { PasswordUpdateService } from '../../../services/password-update.service';
 import { Usuario } from '../../../models/usuario.model';
 
 @Component({
@@ -20,6 +21,7 @@ export class UsuariosComponent implements OnInit {
   constructor(
     private supabase: SupabaseService,
     public authService: AuthService,
+    private passwordUpdateService: PasswordUpdateService,
     private router: Router
   ) {}
 
@@ -76,16 +78,33 @@ export class UsuariosComponent implements OnInit {
       return;
     }
 
-    if (!confirm(`Deseja realmente desativar o usuário "${usuario.nome}"?\n\nO usuário não poderá mais fazer login no sistema.`)) {
+    if (!confirm(`Deseja realmente EXCLUIR DEFINITIVAMENTE o usuário "${usuario.nome}"?\n\nEsta ação removerá o acesso dele ao sistema e apagará o registro.`)) {
       return;
     }
 
     try {
-      await this.supabase.update('usuarios', id, { ativo: false });
-      this.showAlert('Usuário desativado com sucesso!', 'success');
+      this.loading = true;
+      
+      // 1. Remover do Auth via Edge Function
+      const delResult = await this.passwordUpdateService.callAdminFunction({
+        action: 'delete_user',
+        userId: usuario.auth_id,
+        email: usuario.email 
+      });
+
+      if (!delResult.success) {
+        // Se falhar no Auth (ex: usuário não existe mais no auth), prosseguimos deletando da tabela local
+        console.warn('Falha ao deletar do Auth, tentando deletar da tabela local:', delResult.message);
+      }
+
+      // 2. Deletar da tabela local (usuarios)
+      await this.supabase.delete('usuarios', id);
+      
+      this.showAlert('Usuário excluído definitivamente!', 'success');
       await this.carregarUsuarios();
     } catch (error: any) {
-      this.showAlert('Erro ao desativar usuário: ' + error.message, 'danger');
+      this.showAlert('Erro ao excluir usuário: ' + error.message, 'danger');
+      this.loading = false;
     }
   }
 

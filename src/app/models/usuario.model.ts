@@ -2,6 +2,7 @@ export interface Usuario {
   id?: number;
   nome: string;
   email: string;
+  auth_id?: string;
   senha_hash?: string;
   perfil: 'admin' | 'gerente' | 'funcionario';
   ativo?: boolean;

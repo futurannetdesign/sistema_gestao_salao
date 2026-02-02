@@ -157,16 +157,18 @@ export class UsuarioFormComponent implements OnInit {
         
         // Se há senha, atualizar no Supabase Auth usando API REST
         if (dados.senha && dados.senha.length > 0) {
-          // Buscar o email do usuário (usar o email atualizado ou o antigo)
-          const emailParaAtualizar = dados.email || (await this.supabase.select('usuarios', { id: this.usuarioId }) as Usuario[])[0]?.email;
+          // Buscar o usuário completo para ter o auth_id
+          const usuarios = await this.supabase.select('usuarios', { id: this.usuarioId }) as Usuario[];
+          const usuarioAtual = usuarios[0];
           
-          if (!emailParaAtualizar) {
-            throw new Error('Email do usuário não encontrado');
-          }
-          
-          // Atualizar senha usando API REST do Supabase
+          // Atualizar senha via Edge Function (Seguro)
           try {
-            const resultado = await this.passwordUpdateService.updateUserPassword(emailParaAtualizar, dados.senha);
+            const resultado = await this.passwordUpdateService.callAdminFunction({
+              action: 'update_password',
+              userId: usuarioAtual?.auth_id,
+              email: usuarioAtual?.email,
+              password: dados.senha
+            });
             
             if (resultado.success) {
               this.mostrarPopupSucesso('Usuário e senha atualizados com sucesso!');
@@ -198,22 +200,40 @@ export class UsuarioFormComponent implements OnInit {
         }
       } else {
         // Criar novo usuário
-        // Criar registro na tabela usuarios
-        const dadosParaSalvar: any = {
-          nome: dados.nome,
-          email: dados.email,
-          perfil: dados.perfil,
-          ativo: dados.ativo !== false
-        };
-
-        await this.supabase.insert('usuarios', dadosParaSalvar);
         
-        // Avisar que precisa criar no Supabase Auth
-        this.showAlert(
-          '✅ Usuário criado na tabela! Agora crie o usuário no Supabase Auth: Authentication > Users > Add user (Email: ' + dados.email + ' | Senha: [senha informada])',
-          'info'
-        );
-        this.mostrarPopupSucesso('Usuário criado! Crie no Supabase Auth para fazer login.');
+        // 1. Criar Auth User via Edge Function (Automatizado)
+        try {
+          const createResult = await this.passwordUpdateService.createUser(
+            dados.email, 
+            dados.senha, 
+            { nome: dados.nome, perfil: dados.perfil }
+          );
+
+          if (!createResult.success) {
+            throw new Error(createResult.message);
+          }
+
+          // 2. Criar registro na tabela usuarios (Se a Function já não tiver criado via Trigger, mas por segurança garantimos)
+          // Nota: Se você tiver um Trigger 'on auth.users insert -> public.usuarios insert', isso pode duplicar ou falhar.
+          // Assumindo que o sistema atual insere manual:
+          
+          const dadosParaSalvar: any = {
+            nome: dados.nome,
+            email: dados.email,
+            perfil: dados.perfil,
+            ativo: dados.ativo !== false,
+            auth_id: createResult.data.user.id // Vinculando o ID do Auth ao registro local
+          };
+
+          await this.supabase.insert('usuarios', dadosParaSalvar);
+          
+          this.mostrarPopupSucesso('Usuário criado com sucesso! Login liberado.');
+          
+        } catch (err: any) {
+          console.error('Erro ao criar usuário automático:', err);
+          this.showAlert('Erro ao criar login automático: ' + err.message, 'danger');
+          return; // Para não sair da tela
+        }
       }
 
       setTimeout(() => {
