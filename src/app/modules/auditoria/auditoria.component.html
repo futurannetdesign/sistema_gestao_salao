@@ -44,23 +44,23 @@
       </thead>
       <tbody>
         <tr *ngFor="let log of auditoriasFiltradas">
-          <td>
+          <td data-label="Timeline / Ação">
             <div style="font-weight: 600; font-size: 11px;">{{ formatarDataHora(log.created_at) }}</div>
             <div class="badge" [ngClass]="getAcaoBadgeClass(log.acao)"
               style="padding: 1px 4px; font-size: 9px; margin-top: 2px;">
               {{ log.acao }}
             </div>
           </td>
-          <td class="wrap-text">
+          <td data-label="Recurso / ID" class="wrap-text">
             <div style="font-weight: 500; font-size: 11px;">📂 {{ log.tabela }}</div>
             <div style="font-size: 9px; opacity: 0.7; font-family: monospace; margin-top: 2px;">ID: {{ log.registro_id
               || '-' }}</div>
           </td>
-          <td>
+          <td data-label="Usuário">
             <div style="font-size: 11px; font-weight: 500;">👤 {{ log.usuario?.nome || 'Sistema' }}</div>
             <div style="font-size: 9px; opacity: 0.6; margin-top: 1px;">{{ log.usuario?.email || '-' }}</div>
           </td>
-          <td>
+          <td data-label="Detalhes">
             <div class="actions-container">
               <button class="btn-action-standard btn-info" (click)="verDetalhes(log)" title="Ver Detalhes (JSON)">
                 🔍

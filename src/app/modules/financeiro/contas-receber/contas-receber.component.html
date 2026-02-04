@@ -67,26 +67,26 @@
       </thead>
       <tbody>
         <tr *ngFor="let conta of contasFiltradas">
-          <td class="wrap-text">
+          <td data-label="Descrição / Cliente" class="wrap-text">
             <strong>{{ conta.descricao }}</strong>
             <div style="font-size: 11px; opacity: 0.8; margin-top: 2px;">👤 {{ conta.cliente?.nome || '-' }}</div>
           </td>
-          <td style="font-weight: 700; font-size: 14px;">{{ formatarMoeda(conta.valor) }}</td>
-          <td>
+          <td data-label="Valor" style="font-weight: 700; font-size: 14px;">{{ formatarMoeda(conta.valor) }}</td>
+          <td data-label="Vencimento / Pago">
             <div style="font-size: 11px; font-weight: 500;">📅 {{ formatarData(conta.data_vencimento) }}</div>
             <div *ngIf="conta.data_pagamento"
               style="font-size: 10px; color: var(--success-color); font-style: italic; margin-top: 2px;">
               pago em: {{ formatarData(conta.data_pagamento) }}
             </div>
           </td>
-          <td style="font-size: 11px;">💳 {{ conta.forma_pagamento || '-' }}</td>
-          <td>
+          <td data-label="Pagamento" style="font-size: 11px;">💳 {{ conta.forma_pagamento || '-' }}</td>
+          <td data-label="Status">
             <span class="badge" [ngClass]="getStatusBadgeClass(conta.status)"
               style="padding: 2px 8px; font-size: 10px; text-transform: uppercase;">
               {{ getStatusLabel(conta.status) }}
             </span>
           </td>
-          <td>
+          <td data-label="Ações">
             <div class="actions-container">
               <button *ngIf="conta.status !== 'pago' && podeMarcarPago" class="btn-action-standard btn-success"
                 (click)="marcarComoPago(conta.id!)" title="Marcar como Pago">

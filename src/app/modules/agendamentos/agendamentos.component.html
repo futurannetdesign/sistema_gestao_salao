@@ -55,30 +55,30 @@
         </thead>
         <tbody>
           <tr *ngFor="let agendamento of agendamentosFiltrados; trackBy: trackByAgendamentoId">
-            <td class="wrap-text">
+            <td data-label="Cliente" class="wrap-text">
               <strong>{{ agendamento.cliente?.nome || '-' }}</strong>
             </td>
-            <td class="wrap-text">
+            <td data-label="Serviço / Prof" class="wrap-text">
               <div style="font-weight: 500;">{{ agendamento.servico?.nome || '-' }}</div>
               <div style="font-size: 10px; color: var(--primary-color); font-style: italic;">
                 c/ {{ agendamento.profissional?.nome || '-' }}
               </div>
             </td>
-            <td>
+            <td data-label="Data / Hora">
               <div style="font-weight: 500; font-size: 11px;">
                 {{ formatarDataHoraCurta(agendamento.data_hora) }}
               </div>
             </td>
-            <td style="font-weight: 600;">
+            <td data-label="Valor" style="font-weight: 600;">
               {{ formatarMoeda(agendamento.valor_cobrado) }}
             </td>
-            <td>
+            <td data-label="Status">
               <span class="badge" [ngClass]="getStatusBadgeClass(agendamento.status)"
                 style="padding: 2px 8px; font-size: 10px; border-radius: 10px;">
                 {{ getStatusLabel(agendamento.status) }}
               </span>
             </td>
-            <td>
+            <td data-label="Ações">
               <div class="actions-container">
                 <button class="btn-action-standard btn-edit" (click)="editarAgendamento(agendamento.id!)"
                   title="Editar / Status">

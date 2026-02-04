@@ -414,10 +414,78 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  /* TRANSFORMAÇÃO: Tabela para Cartões (Card View) */
+  .table, .table thead, .table tbody, .table th, .table td, .table tr {
+    display: block;
+    width: 100%;
+  }
+
+  /* Esconde o cabeçalho original */
+  .table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  .table tr {
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    padding: 8px;
+  }
+
+  .table td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 45% !important; /* Espaço para o rótulo */
+    white-space: normal;
+    text-align: right;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
+
+  /* Inserção de Rótulos via data-label */
+  .table td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 40%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  /* Ajuste para containers de ação no cartão */
+  .table td .actions-container {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .table-responsive {
+    border: none;
+    background: transparent;
+    overflow-x: hidden; /* Fim do scroll horizontal */
+  }
+}
+
 @media (max-width: 600px) {
-  /* No mobile muito pequeno, forçamos o scroll horizontal */
+  /* Removemos a largura mínima que forçava o scroll */
   .table {
-    min-width: 700px; /* Reduzido para menos "strangulation" */
+    min-width: 0 !important;
   }
 }
 

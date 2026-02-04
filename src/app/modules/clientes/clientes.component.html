@@ -34,13 +34,13 @@
       </thead>
       <tbody>
         <tr *ngFor="let cliente of clientesFiltrados">
-          <td class="wrap-text"><strong>{{ cliente.nome }}</strong></td>
-          <td>
+          <td data-label="Cliente" class="wrap-text"><strong>{{ cliente.nome }}</strong></td>
+          <td data-label="Contato">
             <div style="font-size: 11px;">📱 {{ formatarTelefone(cliente.celular) }}</div>
             <div *ngIf="cliente.whatsapp" style="font-size: 11px; margin-top: 2px; opacity: 0.8;">💬 {{
               formatarTelefone(cliente.whatsapp) }}</div>
           </td>
-          <td>
+          <td data-label="WhatsApp / Ações">
             <div class="actions-container" *ngIf="cliente.whatsapp || cliente.celular">
               <button class="btn-action-standard btn-success" (click)="abrirWhatsApp(cliente)" title="WhatsApp">
                 💬
@@ -54,8 +54,8 @@
               </button>
             </div>
           </td>
-          <td style="font-size: 11px;">{{ cliente.sexo || '-' }}</td>
-          <td>
+          <td data-label="Gênero" style="font-size: 11px;">{{ cliente.sexo || '-' }}</td>
+          <td data-label="Ações">
             <div class="actions-container">
               <button *ngIf="podeEditar" class="btn-action-standard btn-edit" (click)="editarCliente(cliente.id!)"
                 title="Editar">

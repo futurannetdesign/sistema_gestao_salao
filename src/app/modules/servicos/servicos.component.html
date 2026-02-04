@@ -39,16 +39,16 @@
       </thead>
       <tbody>
         <tr *ngFor="let servico of servicosFiltrados">
-          <td class="wrap-text"><strong>{{ servico.nome }}</strong></td>
-          <td>{{ servico.categoria }}</td>
-          <td style="font-weight: 600;">{{ formatarMoeda(servico.valor_padrao) }}</td>
-          <td>{{ servico.duracao_estimada }} min</td>
-          <td>
+          <td data-label="Serviço" class="wrap-text"><strong>{{ servico.nome }}</strong></td>
+          <td data-label="Categoria">{{ servico.categoria }}</td>
+          <td data-label="Valor" style="font-weight: 600;">{{ formatarMoeda(servico.valor_padrao) }}</td>
+          <td data-label="Duração">{{ servico.duracao_estimada }} min</td>
+          <td data-label="Status">
             <div [ngClass]="servico.ativo ? 'badge-success' : 'badge-danger'"
               style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;"></div>
             <span>{{ servico.ativo ? 'Ativo' : 'Inativo' }}</span>
           </td>
-          <td>
+          <td data-label="Ações">
             <div class="actions-container">
               <button *ngIf="podeEditar" class="btn-action-standard btn-edit" (click)="editarServico(servico.id!)"
                 title="Editar">

@@ -34,9 +34,9 @@
       </thead>
       <tbody>
         <tr *ngFor="let profissional of profissionaisFiltrados">
-          <td class="wrap-text"><strong>{{ profissional.nome }}</strong></td>
-          <td style="font-size: 11px;">{{ formatarTelefone(profissional.celular) }}</td>
-          <td>
+          <td data-label="Profissional" class="wrap-text"><strong>{{ profissional.nome }}</strong></td>
+          <td data-label="Celular" style="font-size: 11px;">{{ formatarTelefone(profissional.celular) }}</td>
+          <td data-label="Especialidades">
             <div class="wrap-text" style="font-size: 11px; font-weight: 500; color: var(--primary-color);">
               {{ formatarEspecialidades(profissional.especialidades) }}
             </div>
@@ -44,12 +44,12 @@
               ✉️ {{ profissional.email }}
             </div>
           </td>
-          <td>
+          <td data-label="Status">
             <div [ngClass]="profissional.ativo ? 'badge-success' : 'badge-danger'"
               style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;"></div>
             <span>{{ profissional.ativo ? 'Ativo' : 'Inativo' }}</span>
           </td>
-          <td>
+          <td data-label="Ações">
             <div class="actions-container">
               <button class="btn-action-standard btn-edit" (click)="editarProfissional(profissional.id!)"
                 title="Editar">

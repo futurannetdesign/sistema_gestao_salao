@@ -47,26 +47,26 @@
       </thead>
       <tbody>
         <tr *ngFor="let produto of produtosFiltrados">
-          <td class="wrap-text">
+          <td data-label="Produto" class="wrap-text">
             <strong>{{ produto.nome }}</strong>
             <div style="font-size: 11px; opacity: 0.7; margin-top: 2px;">{{ produto.id }}</div>
           </td>
-          <td class="wrap-text">
+          <td data-label="Categoria / Forn" class="wrap-text">
             <div style="font-size: 11px;">🏷️ {{ produto.categoria || '-' }}</div>
             <div style="font-size: 11px; margin-top: 2px;">🏢 {{ produto.fornecedor?.nome || '-' }}</div>
           </td>
-          <td>
+          <td data-label="Qtd (mín)">
             <div style="font-size: 13px; font-weight: 600;">
               {{ produto.quantidade_atual }} {{ produto.unidade_medida }}
             </div>
             <div style="font-size: 10px; opacity: 0.8; margin-top: 2px;">mín: {{ produto.quantidade_minima }}</div>
           </td>
-          <td>
+          <td data-label="Status">
             <div [ngClass]="(produto.ativo ?? false) ? 'badge-success' : 'badge-danger'"
               style="width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px;"></div>
             <span>{{ (produto.ativo ?? false) ? 'Ativo' : 'Inativo' }}</span>
           </td>
-          <td>
+          <td data-label="Ações">
             <div class="actions-container">
               <button class="btn-action-standard btn-edit" (click)="editarProduto(produto.id!)" title="Editar">
                 📝
