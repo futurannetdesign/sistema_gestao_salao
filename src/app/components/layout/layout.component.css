@@ -4,7 +4,7 @@
   flex-direction: column;
 }
 
-/* --- BASE HEADER (Desktop First for stability, or clear separation) --- */
+/* --- BASE HEADER --- */
 .header {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: var(--white);
@@ -13,7 +13,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: 60px;
+  height: var(--header-height);
   display: flex;
   align-items: center;
 }
@@ -46,11 +46,11 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  min-width: 200px;
+  min-width: 150px;
 }
 
 .logo-text {
-  font-size: 22px;
+  font-size: clamp(16px, 4vw, 22px);
   margin: 0;
   font-weight: 700;
   color: var(--white);
@@ -142,15 +142,15 @@
 }
 
 .sidebar {
-  width: 260px;
+  width: var(--sidebar-width);
   background: var(--white);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   z-index: 90;
   display: flex;
   flex-direction: column;
   position: sticky;
-  top: 60px;
-  height: calc(100vh - 60px);
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
 }
 
 .sidebar-backdrop {
@@ -210,12 +210,14 @@
 /* --- MOBILE QUERIES (max-width: 1024px) --- */
 @media (max-width: 1024px) {
   .header {
-    height: 56px;
-    padding: 0 12px;
+    height: auto;
+    min-height: 56px;
+    padding: 8px 12px;
   }
 
   .header-content {
-    gap: 10px;
+    gap: 8px;
+    flex-wrap: wrap; /* Permite wrap se necessário */
   }
 
   .menu-toggle {
@@ -227,12 +229,13 @@
   }
 
   .logo-container {
-    justify-content: center;
+    justify-content: flex-start;
     min-width: 0;
+    flex: 1;
   }
 
   .logo-text {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .header-info {
@@ -241,6 +244,7 @@
 
   .header-nav {
     gap: 6px;
+    flex-shrink: 0;
   }
 
   .user-info {
@@ -267,11 +271,12 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 280px;
+    width: var(--sidebar-width);
+    max-width: 80vw; /* Proteção para não cobrir 100% da tela */
     height: 100vh;
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1002;
+    z-index: 2000; /* Acima de tudo */
     box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
   }
 
@@ -285,7 +290,7 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(2px);
-    z-index: 1001;
+    z-index: 1005;
     animation: fadeIn 0.2s ease;
   }
 

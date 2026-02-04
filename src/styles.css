@@ -19,6 +19,12 @@
   --border-color: #E0E0E0;
   --shadow: 0 2px 4px rgba(0,0,0,0.1);
   --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
+  
+  /* Responsive Tokens */
+  --sidebar-width: 260px;
+  --header-height: 60px;
+  --table-padding: 8px 12px;
+  --table-font-size: 13px;
 }
 
 /* Utilitários de Visibilidade */
@@ -179,15 +185,14 @@ body {
   background: var(--white);
   border-radius: 8px;
   overflow: hidden;
-  table-layout: fixed; /* Força o controle de largura por coluna */
 }
 
 .table th,
 .table td {
-  padding: 8px 12px; /* Middle ground: comfortable padding */
+  padding: var(--table-padding);
   text-align: left;
   border-bottom: 1px solid var(--border-color);
-  font-size: 13px; /* Slightly larger for readability */
+  font-size: var(--table-font-size);
   color: var(--dark-color);
   white-space: nowrap;
 }
@@ -199,6 +204,17 @@ body {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+/* PROTEÇÃO DESKTOP: Configurações de alta densidade apenas para telas grandes */
+@media (min-width: 1025px) {
+  .table {
+    table-layout: fixed; /* Força o controle de largura por coluna apenas no Desktop */
+  }
+
+  .table-responsive {
+    overflow-x: hidden; /* Evita barra arcaica no desktop */
+  }
 }
 
 /* Permitir quebra de linha apenas em colunas específicas se necessário via classe */
@@ -224,13 +240,6 @@ body {
   margin-top: 10px;
   border: 1px solid var(--border-color);
   background: var(--white);
-}
-
-/* Esconder scrollbar no Desktop para o design ficar limpo, mas manter funcionalidade */
-@media (min-width: 1025px) {
-  .table-responsive {
-    overflow-x: hidden; /* Evita barra arcaica no desktop */
-  }
 }
 
 /* Scrollbar visível nas tabelas responsivas para indicar que há mais conteúdo */
@@ -371,71 +380,44 @@ body {
   opacity: 0.5;
 }
 
-/* Page Header - Padrão Global */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
+/* --- MOBILE OVERRIDES (Global) --- */
+@media (max-width: 1024px) {
+  .container {
+    padding: 10px 12px;
+  }
 
-.page-header h1 {
-  margin: 0;
-  color: var(--primary-color);
-  font-size: 1.5rem;
-  font-weight: 700;
-  flex: 1;
-  min-width: 200px;
-}
+  /* Formulários Mobile-First */
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 12px;
+    font-size: 16px; /* Evita auto-zoom no iOS */
+  }
 
-.page-header .header-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  width: auto;
+  /* Modais Responsivos */
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+    margin: 10px;
+    max-height: 95vh;
+  }
+
+  /* Ajustes de Tabela Mobile */
+  .table-responsive {
+    border-radius: 4px;
+    box-shadow: none;
+  }
+
+  .table th, .table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 600px) {
-  .page-header {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-    gap: 12px;
-  }
-  
-  .page-header h1 {
-    font-size: 1.15rem; /* Ainda menor */
-    text-align: center;
-    width: 100%;
-  }
-  
-  .header-actions {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .header-actions .btn {
-    width: 100%; /* Botão "Novo" ocupa largura total no mobile */
-    justify-content: center;
-  }
-
-  /* Card padding reduzido no mobile */
-  .card {
-    padding: 12px;
-  }
-
-  .table-responsive {
-    overflow-x: auto; /* Reativa scroll no mobile */
-  }
-
+  /* No mobile muito pequeno, forçamos o scroll horizontal */
   .table {
-    min-width: 800px; /* Reduzido de 850px para caber melhor */
-  }
-
-  .search-input {
-    font-size: 16px !important; /* Evita zoom forçado no iOS Safari */
+    min-width: 700px; /* Reduzido para menos "strangulation" */
   }
 }
 
