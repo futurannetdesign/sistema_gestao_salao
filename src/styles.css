@@ -502,6 +502,37 @@ body {
     background: transparent;
     overflow-x: hidden; /* Fim do scroll horizontal */
   }
+
+  /* --- PAGE HEADERS & ACTIONS (GLOBAL MOBILE) --- */
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 15px !important;
+    margin-bottom: 30px !important;
+  }
+
+  .page-header h1 {
+    font-size: 22px !important;
+    width: 100% !important;
+    line-height: 1.2 !important;
+  }
+
+  .header-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .header-actions button,
+  .header-actions .btn {
+    width: 100% !important;
+    margin: 0 !important;
+    min-height: 48px; /* App hit area */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
 }
 
 @media (max-width: 600px) {
