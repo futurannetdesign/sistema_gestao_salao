@@ -66,3 +66,18 @@
   min-width: 120px;
 }
 
+@media (max-width: 768px) {
+  .resumo-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .filters-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-select, .search-input {
+    width: 100%;
+  }
+}

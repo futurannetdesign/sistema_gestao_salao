@@ -441,38 +441,60 @@ body {
     border: none;
     border-bottom: 1px solid #eee;
     position: relative;
-    padding-left: 45% !important; /* Espaço para o rótulo */
+    padding: 14px 12px 14px 42% !important; /* Aumentado padding para toque e espaço */
     white-space: normal;
     text-align: right;
-    min-height: 40px;
+    min-height: 52px; /* Touch target superior */
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 8px;
+    overflow-wrap: break-word;
+    word-break: break-all; /* Força quebra em valores muito longos */
   }
 
   .table td:last-child {
     border-bottom: 0;
+    justify-content: center;
+    padding-left: 12px !important;
+    background: #fdfdfd;
+    min-height: 60px; /* Mais espaço para botões */
   }
 
   /* Inserção de Rótulos via data-label */
   .table td:before {
     content: attr(data-label);
     position: absolute;
-    left: 10px;
-    width: 40%;
-    padding-right: 10px;
-    white-space: nowrap;
+    left: 12px;
+    width: 38%;
+    padding-right: 8px;
+    white-space: normal;
     text-align: left;
     font-weight: 700;
     color: var(--primary-color);
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
+    line-height: 1.2;
+    pointer-events: none; /* Não interfere no clique */
   }
 
   /* Ajuste para containers de ação no cartão */
-  .table td .actions-container {
-    justify-content: flex-end;
+  .table td .actions-container,
+  .actions-container {
+    display: flex;
+    gap: 12px; /* Espaço maior entre botões no mobile */
+    justify-content: center;
     width: 100%;
+    flex-wrap: wrap; /* Permite que os botões quebrem linha se muitos */
+  }
+
+  .btn-action-standard {
+    width: 44px; /* Hit area ideal para mobile */
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
   }
 
   .table-responsive {
